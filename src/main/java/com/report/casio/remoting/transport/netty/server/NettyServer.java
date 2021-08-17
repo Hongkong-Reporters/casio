@@ -39,7 +39,7 @@ public class NettyServer implements Server {
                         ChannelPipeline pipeline = channel.pipeline();
                         // 心跳机制
                         pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
-                        pipeline.addLast(new RpcMessageEncoder());
+//                        pipeline.addLast(new RpcMessageEncoder());
 //                        pipeline.addLast(new RpcMessageDecoder());
                         pipeline.addLast(new NettyServerHandler());
                     }
