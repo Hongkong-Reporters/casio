@@ -1,4 +1,7 @@
 package com.report.casio.rpc.proxy;
 
-public class RpcProxy {
+public interface RpcProxy {
+
+    <T> T getProxy(Class<T> clazz);
+
 }
