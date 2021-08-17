@@ -6,7 +6,7 @@ import java.net.InetSocketAddress;
 
 public interface Client {
 
-    void doConnect();
+    Channel doConnect(InetSocketAddress inetSocketAddress);
 
     void doClose();
 
