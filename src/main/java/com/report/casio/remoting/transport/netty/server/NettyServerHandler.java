@@ -19,7 +19,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         if (msg instanceof RpcRequest) {
             log.info("server read success request, {}", msg);
         } else {
-            log.info("server read success data, {}", msg);
+            log.info("server read error msg, {}", msg);
         }
     }
 

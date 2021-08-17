@@ -5,7 +5,8 @@ import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
 import com.report.casio.registry.ServiceDiscovery;
 import com.report.casio.remoting.transport.netty.RpcRequestTransport;
-import com.report.casio.remoting.transport.netty.codec.RpcMessageEncoder;
+import com.report.casio.remoting.transport.netty.client.cache.ChannelClient;
+import com.report.casio.remoting.transport.netty.client.cache.CompletableRequest;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -48,6 +49,7 @@ public class NettyClient implements Client, RpcRequestTransport {
 
     @SneakyThrows
     @Override
+    // connect方法线程安全，连接会创建一个新的NioSocketChannel
     public Channel doConnect(InetSocketAddress inetSocketAddress) {
         CompletableFuture<Channel> completableFuture = new CompletableFuture<>();
         bootstrap.connect(inetSocketAddress).addListener((ChannelFutureListener) future -> {
@@ -79,10 +81,11 @@ public class NettyClient implements Client, RpcRequestTransport {
     public CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest rpcRequest) {
         CompletableFuture<RpcResponse> completableFuture = new CompletableFuture<>();
 
-//        InetSocketAddress inetSocketAddress = serviceDiscovery.lookup(rpcRequest);
+        InetSocketAddress inetSocketAddress = serviceDiscovery.lookup(rpcRequest);
 
-        Channel channel = getChannel(InetSocketAddress.createUnresolved("10.1.83.189", 9001));
+        Channel channel = getChannel(inetSocketAddress);
         if (channel.isActive()) {
+            CompletableRequest.put(rpcRequest.getRequestId(), completableFuture);
             channel.writeAndFlush(rpcRequest);
         } else {
             log.error("channel is not active");

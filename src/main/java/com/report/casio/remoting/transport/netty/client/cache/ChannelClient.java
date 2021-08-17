@@ -1,4 +1,4 @@
-package com.report.casio.remoting.transport.netty.client;
+package com.report.casio.remoting.transport.netty.client.cache;
 
 import io.netty.channel.Channel;
 
@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+// 保存Channel信息，用于客户端数据发送
 public class ChannelClient {
     private ChannelClient() {}
 
