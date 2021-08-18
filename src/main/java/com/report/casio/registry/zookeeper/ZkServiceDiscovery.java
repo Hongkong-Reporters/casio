@@ -1,20 +1,26 @@
 package com.report.casio.registry.zookeeper;
 
 import com.report.casio.common.utils.StringUtils;
+import com.report.casio.config.RegistryConfig;
 import com.report.casio.config.RpcContextFactory;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.registry.ServiceDiscovery;
 
 import java.net.InetSocketAddress;
-import java.util.List;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ZkServiceDiscovery implements ServiceDiscovery {
     @Override
     public InetSocketAddress lookup(RpcRequest rpcRequest) {
         String path = StringUtils.generateProviderPath(rpcRequest.getServiceName());
         try {
-            List<String> childNode = ZkUtils.getChildNode("127.0.0.1:2181", path);
-            String hostname = RpcContextFactory.getRpcContext().getDefaultLoadBalance().select(childNode, rpcRequest.getServiceName());
+            Set<String> childNode = new HashSet<>();
+            for (RegistryConfig registryConfig : RpcContextFactory.getRpcContext().getRegistryConfigs()) {
+                childNode.addAll(ZkUtils.getChildNode(registryConfig.getHost(), path));
+            }
+            String hostname = RpcContextFactory.getRpcContext().getDefaultLoadBalance().select(new ArrayList<>(childNode), rpcRequest.getServiceName());
             if (StringUtils.isBlank(hostname)) {
                 return null;
             }

@@ -35,7 +35,7 @@ public class RpcClientProxy implements RpcProxy, InvocationHandler {
                 .parameters(args)
                 .build();
         try {
-            return transport.sendRpcRequest(request).get();
+            return transport.sendRpcRequest(request).get().getResult();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
