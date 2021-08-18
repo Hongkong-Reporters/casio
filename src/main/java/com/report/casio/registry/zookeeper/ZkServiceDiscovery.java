@@ -13,8 +13,11 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
     public InetSocketAddress lookup(RpcRequest rpcRequest) {
         String path = StringUtils.generateProviderPath(rpcRequest.getServiceName());
         try {
-            List<String> childNode = ZkUtils.getChildNode("", path);
+            List<String> childNode = ZkUtils.getChildNode("127.0.0.1:2181", path);
             String hostname = RpcContextFactory.getRpcContext().getDefaultLoadBalance().select(childNode, rpcRequest.getServiceName());
+            if (StringUtils.isBlank(hostname)) {
+                return null;
+            }
             String[] split = hostname.split(":");
             if (split.length != 2) {
                 return null;

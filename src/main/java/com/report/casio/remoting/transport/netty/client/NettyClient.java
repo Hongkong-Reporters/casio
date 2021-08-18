@@ -1,7 +1,9 @@
 package com.report.casio.remoting.transport.netty.client;
 
 import com.report.casio.common.exception.RemotingException;
+import com.report.casio.common.utils.ByteUtils;
 import com.report.casio.config.RpcContextFactory;
+import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
 import com.report.casio.remoting.transport.netty.RpcRequestTransport;
@@ -78,15 +80,22 @@ public class NettyClient implements Client, RpcRequestTransport {
     }
 
     @Override
+    @SneakyThrows
     public CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest rpcRequest) {
         CompletableFuture<RpcResponse> completableFuture = new CompletableFuture<>();
 
         InetSocketAddress inetSocketAddress = RpcContextFactory.getRpcContext().getDefaultServiceDiscovery().lookup(rpcRequest);
+        if (inetSocketAddress == null) {
+            log.error("service {} get failed", rpcRequest.getServiceName());
+            return completableFuture;
+        }
 
         Channel channel = getChannel(inetSocketAddress);
         if (channel.isActive()) {
             CompletableRequest.put(rpcRequest.getRequestId(), completableFuture);
-            channel.writeAndFlush(rpcRequest);
+            RpcMessage rpcMessage = new RpcMessage();
+            rpcMessage.setContent(ByteUtils.objectToBytes(rpcRequest));
+            channel.writeAndFlush(rpcMessage);
         } else {
             log.error("channel is not active");
         }

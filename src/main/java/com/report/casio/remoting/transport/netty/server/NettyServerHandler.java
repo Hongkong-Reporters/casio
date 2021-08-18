@@ -1,8 +1,11 @@
 package com.report.casio.remoting.transport.netty.server;
 
+import com.report.casio.common.utils.ByteUtils;
+import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -14,10 +17,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
         super.channelActive(ctx);
     }
 
+    @SneakyThrows
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        if (msg instanceof RpcRequest) {
-            log.info("server read success request, {}", msg);
+        if (msg instanceof RpcMessage) {
+            RpcMessage rpcMessage = (RpcMessage) msg;
+            RpcRequest request = (RpcRequest) ByteUtils.bytesToObject(rpcMessage.getContent());
+            log.info("server read success request, {}", request);
         } else {
             log.info("server read error msg, {}", msg);
         }

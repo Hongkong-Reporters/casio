@@ -12,9 +12,14 @@ public class StringUtils {
     }
 
     public static String generateProviderPath(String serviceName) {
-        return Constants.PROJECT + ZK_SEPARATOR +
-                serviceName +
-                Constants.PROVIDER + ZK_SEPARATOR;
+        return ZK_SEPARATOR + Constants.PROJECT +
+                ZK_SEPARATOR + serviceName +
+                ZK_SEPARATOR + Constants.PROVIDER;
+    }
+
+    public static String generateProviderPath(String serviceName, String address) {
+        return generateProviderPath(serviceName) +
+                ZK_SEPARATOR + address;
     }
 
 }

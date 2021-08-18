@@ -1,7 +1,7 @@
 package com.report.casio.rpc.proxy;
 
 import com.report.casio.domain.RpcRequest;
-import com.report.casio.remoting.transport.netty.client.NettyClient;
+import com.report.casio.remoting.transport.netty.RpcRequestTransport;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -10,11 +10,11 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
 public class RpcClientProxy implements RpcProxy, InvocationHandler {
-    private final NettyClient nettyClient;
+    private final RpcRequestTransport transport;
     private Class<?> clazz;
 
-    public RpcClientProxy(NettyClient nettyClient) {
-        this.nettyClient = nettyClient;
+    public RpcClientProxy(RpcRequestTransport transport) {
+        this.transport = transport;
     }
 
     @Override
@@ -35,7 +35,7 @@ public class RpcClientProxy implements RpcProxy, InvocationHandler {
                 .parameters(args)
                 .build();
         try {
-            return nettyClient.sendRpcRequest(request).get();
+            return transport.sendRpcRequest(request).get();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }

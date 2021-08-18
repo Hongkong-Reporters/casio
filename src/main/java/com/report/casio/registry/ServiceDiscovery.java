@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 
 public interface ServiceDiscovery {
 
+    // 服务发现接口
     InetSocketAddress lookup(RpcRequest rpcRequest);
 
 }

@@ -9,7 +9,7 @@ import io.netty.handler.codec.MessageToByteEncoder;
 public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
 
     @Override
-    protected void encode(ChannelHandlerContext channelHandlerContext, RpcMessage rpcMessage, ByteBuf byteBuf) throws Exception {
+    protected void encode(ChannelHandlerContext channelHandlerContext, RpcMessage rpcMessage, ByteBuf byteBuf) {
         byteBuf.writeByte(ProtocolConstants.MAGIC);
         byteBuf.writeByte(ProtocolConstants.VERSION);
         byteBuf.writeByte(rpcMessage.getType());
