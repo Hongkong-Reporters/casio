@@ -1,9 +1,9 @@
 package com.report.casio.remoting.transport.netty.client;
 
 import com.report.casio.common.exception.RemotingException;
+import com.report.casio.config.RpcContextFactory;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
-import com.report.casio.registry.ServiceDiscovery;
 import com.report.casio.remoting.transport.netty.RpcRequestTransport;
 import com.report.casio.remoting.transport.netty.client.cache.ChannelClient;
 import com.report.casio.remoting.transport.netty.client.cache.CompletableRequest;
@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 public class NettyClient implements Client, RpcRequestTransport {
     private final Bootstrap bootstrap;
     private final EventLoopGroup workGroup;
-    private final ServiceDiscovery serviceDiscovery;
 
     public NettyClient() {
         this.bootstrap = new Bootstrap();
@@ -44,7 +43,6 @@ public class NettyClient implements Client, RpcRequestTransport {
                         pipeline.addLast(new NettyClientHandler());
                     }
                 });
-        serviceDiscovery = null;
     }
 
     @SneakyThrows
@@ -81,7 +79,7 @@ public class NettyClient implements Client, RpcRequestTransport {
     public CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest rpcRequest) {
         CompletableFuture<RpcResponse> completableFuture = new CompletableFuture<>();
 
-        InetSocketAddress inetSocketAddress = serviceDiscovery.lookup(rpcRequest);
+        InetSocketAddress inetSocketAddress = RpcContextFactory.getRpcContext().getDefaultServiceDiscovery().lookup(rpcRequest);
 
         Channel channel = getChannel(inetSocketAddress);
         if (channel.isActive()) {
