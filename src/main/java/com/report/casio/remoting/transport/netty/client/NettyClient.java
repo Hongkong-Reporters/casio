@@ -7,6 +7,8 @@ import com.report.casio.domain.RpcResponse;
 import com.report.casio.remoting.transport.netty.RpcRequestTransport;
 import com.report.casio.remoting.transport.netty.client.cache.ChannelClient;
 import com.report.casio.remoting.transport.netty.client.cache.CompletableRequest;
+import com.report.casio.remoting.transport.netty.codec.RpcMessageDecoder;
+import com.report.casio.remoting.transport.netty.codec.RpcMessageEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -38,8 +40,8 @@ public class NettyClient implements Client, RpcRequestTransport {
                         ChannelPipeline pipeline = channel.pipeline();
                         // 心跳机制
                         pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
-//                        pipeline.addLast(new RpcMessageEncoder());
-//                        pipeline.addLast(new RpcMessageDecoder());
+                        pipeline.addLast(new RpcMessageEncoder());
+                        pipeline.addLast(new RpcMessageDecoder());
                         pipeline.addLast(new NettyClientHandler());
                     }
                 });

@@ -1,5 +1,7 @@
 package com.report.casio.domain;
 
-public class RpcStatus {
+import java.io.Serializable;
+
+public class RpcStatus implements Serializable {
 
 }
