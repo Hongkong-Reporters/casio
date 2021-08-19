@@ -93,6 +93,7 @@ public class NettyClient implements Client, RpcRequestTransport {
         if (channel.isActive()) {
             CompletableRequest.put(rpcRequest.getRequestId(), completableFuture);
             RpcMessage rpcMessage = new RpcMessage(rpcRequest);
+            log.info("send message to {}", inetSocketAddress);
             if (channel.isWritable()) {
                 channel.writeAndFlush(rpcMessage);
             } else {

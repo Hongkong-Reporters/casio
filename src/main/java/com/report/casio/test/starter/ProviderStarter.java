@@ -17,7 +17,7 @@ public class ProviderStarter implements CasioStarter {
     @SneakyThrows
     @Override
     public void start() {
-        Set<ServiceConfig> serviceConfigs = AnnScanUtils.scanRegisterService("com.report.casio");
+        Set<ServiceConfig> serviceConfigs = AnnScanUtils.scanRegisterService("com.report.casio.test");
         RpcContext context = RpcContextFactory.getRpcContext();
         for (ServiceConfig serviceConfig : serviceConfigs) {
             context.getDefaultServiceRegistry().register(serviceConfig);

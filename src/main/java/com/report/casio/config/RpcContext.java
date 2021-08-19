@@ -22,6 +22,9 @@ public class RpcContext {
     private final List<RegistryConfig> registryConfigs = new ArrayList<>();
     private final Map<String, Object> beanMap = new ConcurrentHashMap<>();
 
+    private final ProviderConfig providerConfig = new ProviderConfig(9002);
+    private final ConsumerConfig consumerConfig = new ConsumerConfig();
+
     // 测试
     @SneakyThrows
     public RpcContext() {
@@ -37,7 +40,7 @@ public class RpcContext {
         registryConfigs.add(registryConfig);
 
         try {
-            for (ServiceConfig serviceConfig : AnnScanUtils.scanRegisterService("com.report.casio")) {
+            for (ServiceConfig serviceConfig : AnnScanUtils.scanRegisterService("com.report.casio.test")) {
                 beanMap.putIfAbsent(serviceConfig.getServiceName(), Class.forName(serviceConfig.getRef()).newInstance());
             }
         } catch (Exception e) {
@@ -60,6 +63,14 @@ public class RpcContext {
 
     public List<RegistryConfig> getRegistryConfigs() {
         return registryConfigs;
+    }
+
+    public ProviderConfig getProviderConfig() {
+        return providerConfig;
+    }
+
+    public ConsumerConfig getConsumerConfig() {
+        return consumerConfig;
     }
 
     public Object getBean(String serviceName) {

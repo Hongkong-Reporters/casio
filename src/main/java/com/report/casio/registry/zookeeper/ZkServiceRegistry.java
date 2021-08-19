@@ -6,16 +6,16 @@ import com.report.casio.config.RpcContextFactory;
 import com.report.casio.config.ServiceConfig;
 import com.report.casio.registry.ServiceRegistry;
 
-import java.net.InetAddress;
 import java.util.List;
 
 public class ZkServiceRegistry implements ServiceRegistry {
     @Override
     public void register(ServiceConfig serviceConfig) throws Exception {
         List<RegistryConfig> registryConfigs = RpcContextFactory.getRpcContext().getRegistryConfigs();
+
         for (RegistryConfig registryConfig : registryConfigs) {
             ZkUtils.create(registryConfig.getHost(),
-                    StringUtils.generateProviderPath(serviceConfig.getServiceName(), InetAddress.getLocalHost().getHostAddress() + ":9001"), null);
+                    StringUtils.generateProviderPath(serviceConfig.getServiceName(), RpcContextFactory.getRpcContext().getProviderConfig().getHost()), null);
         }
     }
 }

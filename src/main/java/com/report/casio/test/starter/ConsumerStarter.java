@@ -11,8 +11,10 @@ public class ConsumerStarter implements CasioStarter {
     public void start() {
         NettyClient client = new NettyClient();
         IDemoService service = new RpcClientProxy(client).getProxy(IDemoService.class);
-        String hello = service.sayHello();
-        log.info("result: " + hello);
+
+        for (int i = 0; i < 100; i++) {
+            service.sayHello();
+        }
     }
 
     public static void main(String[] args) {
