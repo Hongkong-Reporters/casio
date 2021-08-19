@@ -1,6 +1,8 @@
 package com.report.casio.rpc.protocol;
 
 public class ProtocolConstants {
+    private ProtocolConstants() {}
+
     public static final byte MAGIC = 0x27;
     public static final byte VERSION = 0x01;
 

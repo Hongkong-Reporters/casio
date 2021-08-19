@@ -5,6 +5,7 @@ import com.report.casio.config.RpcContextFactory;
 import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
+import com.report.casio.rpc.protocol.ProtocolConstants;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.SneakyThrows;
@@ -26,7 +27,13 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof RpcMessage) {
             RpcMessage rpcMessage = (RpcMessage) msg;
-            RpcRequest request = (RpcRequest) ByteUtils.bytesToObject(rpcMessage.getContent());
+            RpcRequest request;
+            if (rpcMessage.getType() == ProtocolConstants.REQUEST_TYPE) {
+                request = (RpcRequest) ByteUtils.bytesToObject(rpcMessage.getContent());
+            } else {
+                log.info("server read error msg type, {}", rpcMessage);
+                return;
+            }
             Object service = RpcContextFactory.getRpcContext().getBean(request.getServiceName());
             if (service == null) {
                 log.error("service Impl not exist, serviceName: {}", request.getServiceName());
@@ -36,8 +43,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                 RpcResponse rpcResponse = new RpcResponse();
                 rpcResponse.setResult(result);
                 rpcResponse.setRequestId(request.getRequestId());
-                RpcMessage resMessage = new RpcMessage();
-                resMessage.setContent(ByteUtils.objectToBytes(rpcResponse));
+                RpcMessage resMessage = new RpcMessage(rpcResponse);
                 ctx.writeAndFlush(resMessage);
             }
             log.info("server read success request, {}", request);
