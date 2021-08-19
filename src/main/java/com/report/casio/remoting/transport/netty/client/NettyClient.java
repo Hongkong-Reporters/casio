@@ -1,7 +1,6 @@
 package com.report.casio.remoting.transport.netty.client;
 
 import com.report.casio.common.exception.RemotingException;
-import com.report.casio.common.utils.ByteUtils;
 import com.report.casio.config.RpcContextFactory;
 import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
@@ -38,7 +37,7 @@ public class NettyClient implements Client, RpcRequestTransport {
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel channel) throws Exception {
+                    protected void initChannel(SocketChannel channel) {
                         ChannelPipeline pipeline = channel.pipeline();
                         // 心跳机制
                         pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
@@ -100,6 +99,7 @@ public class NettyClient implements Client, RpcRequestTransport {
                 log.warn("发送消息队列busy，已达到最高水位，发送失败");
             }
         } else {
+            ChannelClient.remove(inetSocketAddress);
             log.error("channel is not active");
         }
 

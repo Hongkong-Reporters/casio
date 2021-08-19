@@ -1,7 +1,9 @@
 package com.report.casio.rpc.proxy;
 
 import com.report.casio.domain.RpcRequest;
+import com.report.casio.domain.RpcResponse;
 import com.report.casio.remoting.transport.netty.RpcRequestTransport;
+import com.report.casio.remoting.transport.netty.client.cache.CompletableRequest;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -35,7 +37,9 @@ public class RpcClientProxy implements RpcProxy, InvocationHandler {
                 .parameters(args)
                 .build();
         try {
-            return transport.sendRpcRequest(request).get().getResult();
+            RpcResponse rpcResponse = transport.sendRpcRequest(request).get();
+            CompletableRequest.remove(rpcResponse.getRequestId());
+            return rpcResponse.getResult();
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }

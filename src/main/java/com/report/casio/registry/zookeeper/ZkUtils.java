@@ -1,6 +1,5 @@
 package com.report.casio.registry.zookeeper;
 
-import com.report.casio.common.Constants;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;

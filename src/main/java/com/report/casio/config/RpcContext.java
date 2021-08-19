@@ -16,11 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 // 服务提供者注解扫描注入类
 // 写法存在问题，context可见性太高
 public class RpcContext {
-    private LoadBalance defaultLoadBalance;
-    private ServiceDiscovery defaultServiceDiscovery;
-    private ServiceRegistry defaultServiceRegistry;
-    private List<RegistryConfig> registryConfigs = new ArrayList<>();
-    private Map<String, Object> beanMap = new ConcurrentHashMap<>();
+    private final LoadBalance defaultLoadBalance;
+    private final ServiceDiscovery defaultServiceDiscovery;
+    private final ServiceRegistry defaultServiceRegistry;
+    private final List<RegistryConfig> registryConfigs = new ArrayList<>();
+    private final Map<String, Object> beanMap = new ConcurrentHashMap<>();
 
     // 测试
     @SneakyThrows

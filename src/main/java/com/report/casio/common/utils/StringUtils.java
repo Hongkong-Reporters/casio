@@ -15,6 +15,7 @@ public class StringUtils {
         return !isBlank(s);
     }
 
+    // 生成服务在注册中心注册的路径
     public static String generateProviderPath(String serviceName) {
         return ZK_SEPARATOR + Constants.PROJECT +
                 ZK_SEPARATOR + serviceName +

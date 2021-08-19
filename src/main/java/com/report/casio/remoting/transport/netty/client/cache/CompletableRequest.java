@@ -18,7 +18,13 @@ public class CompletableRequest {
     }
 
     public static void put(String requestId, CompletableFuture<RpcResponse> completableFuture) {
-        COMPLETABLE_REQUEST_MAP.put(requestId, completableFuture);
+        COMPLETABLE_REQUEST_MAP.putIfAbsent(requestId, completableFuture);
+    }
+
+    public static void remove(String request) {
+        synchronized (COMPLETABLE_REQUEST_MAP) {
+            COMPLETABLE_REQUEST_MAP.remove(request);
+        }
     }
 
 }
