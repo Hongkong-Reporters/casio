@@ -13,6 +13,11 @@ public class ConsumerStarter implements CasioStarter {
         IDemoService service = new RpcClientProxy(client).getProxy(IDemoService.class);
         String hello = service.sayHello();
         log.info("result: " + hello);
+
+        IDemoService service2 = new RpcClientProxy(client).getProxy(IDemoService.class);
+        String hello2 = service.sayHello();
+        log.info("result: " + hello2);
+
     }
 
     public static void main(String[] args) {

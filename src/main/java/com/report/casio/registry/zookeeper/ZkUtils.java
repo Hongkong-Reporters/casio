@@ -1,12 +1,15 @@
 package com.report.casio.registry.zookeeper;
 
+import com.report.casio.registry.cache.ConsumerServiceDiscoveryCache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.api.CuratorWatcher;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -73,6 +76,17 @@ public class ZkUtils {
         return ZK_MAP.get(hostname)
                 .getChildren()
                 .forPath(path);
+    }
+
+    public static void addNodeWatcher(String hostname, String path) throws Exception {
+        if (exist(hostname, path)) {
+            CuratorFramework framework = ZK_MAP.get(hostname);
+            framework.getData()
+                    .usingWatcher((CuratorWatcher) watchedEvent -> ConsumerServiceDiscoveryCache.remove(path))
+                    .forPath(path);
+        } else {
+            log.error("{} not exist node, can not add watcher", hostname);
+        }
     }
 
 }
