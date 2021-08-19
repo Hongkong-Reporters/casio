@@ -1,82 +1,78 @@
 package com.report.casio.registry.zookeeper;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.data.Stat;
+import org.apache.curator.RetryPolicy;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.retry.ExponentialBackoffRetry;
+import org.apache.zookeeper.CreateMode;
 
-import java.io.IOException;
-import java.net.InetSocketAddress;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CountDownLatch;
 
 @Slf4j
+/*
+  路径：casio/serviceName/providers/hostname：服务提供者注册的路径格式
+       casio/serviceName/routers：暂不考虑，参考dubbo，用于服务治理
+  consumers节点是否需要?
+  providers和routers不采用持久化节点
+ */
 public class ZkUtils {
     private ZkUtils() {}
 
-    private static final Map<InetSocketAddress, ZooKeeper> ZK_MAP = new ConcurrentHashMap<>();
-    private static final CountDownLatch LATCH = new CountDownLatch(1);
-    private static final int TIMEOUT = 5000;
+    private static final Map<String, CuratorFramework> ZK_MAP = new ConcurrentHashMap<>();
+    private static final Integer CONNECT_TIMEOUT = 3 * 1000;    // 连接超时时间
+    private static final Integer SESSION_TIMEOUT = 30 * 1000;   // 回话超时时间
 
-    public static ZooKeeper connect(InetSocketAddress inetSocketAddress) {
-        return connect(inetSocketAddress, TIMEOUT);
+    public static void connect(String hostname) {
+        RetryPolicy retryPolicy = new ExponentialBackoffRetry(1000, 3);
+        if (!ZK_MAP.containsKey(hostname)) {
+            CuratorFramework curatorFramework = CuratorFrameworkFactory.builder()
+                    .connectString(hostname)
+                    .retryPolicy(retryPolicy)
+                    .connectionTimeoutMs(CONNECT_TIMEOUT)
+                    .sessionTimeoutMs(SESSION_TIMEOUT)
+                    .build();
+            curatorFramework.start();
+            ZK_MAP.putIfAbsent(hostname, curatorFramework);
+        }
     }
 
-    public static ZooKeeper connect(InetSocketAddress inetSocketAddress, int timeout) {
-        ZooKeeper zooKeeper = null;
-        try {
-            zooKeeper = new ZooKeeper(inetSocketAddress.getHostString(), timeout, event -> {
-                if (event.getState() == Watcher.Event.KeeperState.SyncConnected && event.getType() == Watcher.Event.EventType.None) {
-                    log.info("zookeeper主机名 {} 连接成功", inetSocketAddress);
-                    LATCH.countDown();
-                }
-                if (event.getState() == Watcher.Event.KeeperState.Closed) {
-                    ZK_MAP.remove(inetSocketAddress);
-                }
-            });
-            ZK_MAP.putIfAbsent(inetSocketAddress, zooKeeper);
-            LATCH.await();
-        } catch (IOException | InterruptedException e) {
-            log.error("连接zookeeper失败");
-        } finally {
-            if (zooKeeper != null) {
-                try {
-                    zooKeeper.close();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+    public static void close(String hostname) {
+        if (ZK_MAP.containsKey(hostname)) {
+            ZK_MAP.get(hostname).close();
         }
-        return zooKeeper;
     }
 
-    public static byte[] getData(InetSocketAddress inetSocketAddress, String path) {
-        if (exist(inetSocketAddress, path)) {
-            ZooKeeper zooKeeper = ZK_MAP.get(inetSocketAddress);
-            try {
-                return zooKeeper.getData(path, false, new Stat());
-            } catch (KeeperException | InterruptedException e) {
-                e.printStackTrace();
-            }
-        }  else {
-            log.error("address {} not exist", inetSocketAddress);
-            return null;
-        }
-        return null;
-    }
-
-    public static boolean exist(InetSocketAddress inetSocketAddress, String path) {
-        if (!ZK_MAP.containsKey(inetSocketAddress)) {
-            return false;
-        }
-        try {
-            return ZK_MAP.get(inetSocketAddress).exists(path, false) != null;
-        } catch (KeeperException | InterruptedException e) {
-            e.printStackTrace();
+    public static boolean exist(String hostname, String path) throws Exception {
+        if (ZK_MAP.containsKey(hostname)) {
+            CuratorFramework curatorFramework = ZK_MAP.get(hostname);
+            return curatorFramework.checkExists().forPath(path) != null;
         }
         return false;
+    }
+
+    public static void create(String hostname, String path, byte[] data) throws Exception {
+        if (!ZK_MAP.containsKey(hostname)) {
+            connect(hostname);
+        }
+        if (!exist(hostname, path)) {
+            CuratorFramework curatorFramework = ZK_MAP.get(hostname);
+            curatorFramework.create()
+                    .creatingParentsIfNeeded()
+                    .withMode(CreateMode.EPHEMERAL)
+                    .forPath(path, data);
+        }
+    }
+
+    public static List<String> getChildNode(String hostname, String path) throws Exception {
+        if (!exist(hostname, path)) {
+            connect(hostname);
+        }
+        return ZK_MAP.get(hostname)
+                .getChildren()
+                .forPath(path);
     }
 
 }

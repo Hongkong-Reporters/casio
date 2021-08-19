@@ -1,4 +1,4 @@
-package com.report.casio.service;
+package com.report.casio.test.service;
 
 public interface IDemoService {
 

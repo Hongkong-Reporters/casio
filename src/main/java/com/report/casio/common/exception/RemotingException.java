@@ -4,6 +4,7 @@ import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
 
+// remoting相关自定义异常类
 public class RemotingException extends Exception {
     private InetSocketAddress localAddress;
     private InetSocketAddress remoteAddress;

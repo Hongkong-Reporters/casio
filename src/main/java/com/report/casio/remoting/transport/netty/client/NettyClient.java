@@ -1,12 +1,15 @@
 package com.report.casio.remoting.transport.netty.client;
 
 import com.report.casio.common.exception.RemotingException;
+import com.report.casio.config.RpcContextFactory;
+import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
-import com.report.casio.registry.ServiceDiscovery;
 import com.report.casio.remoting.transport.netty.RpcRequestTransport;
 import com.report.casio.remoting.transport.netty.client.cache.ChannelClient;
 import com.report.casio.remoting.transport.netty.client.cache.CompletableRequest;
+import com.report.casio.remoting.transport.netty.codec.RpcMessageDecoder;
+import com.report.casio.remoting.transport.netty.codec.RpcMessageEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -24,7 +27,6 @@ import java.util.concurrent.TimeUnit;
 public class NettyClient implements Client, RpcRequestTransport {
     private final Bootstrap bootstrap;
     private final EventLoopGroup workGroup;
-    private final ServiceDiscovery serviceDiscovery;
 
     public NettyClient() {
         this.bootstrap = new Bootstrap();
@@ -35,16 +37,15 @@ public class NettyClient implements Client, RpcRequestTransport {
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
                 .handler(new ChannelInitializer<SocketChannel>() {
                     @Override
-                    protected void initChannel(SocketChannel channel) throws Exception {
+                    protected void initChannel(SocketChannel channel) {
                         ChannelPipeline pipeline = channel.pipeline();
                         // 心跳机制
                         pipeline.addLast(new IdleStateHandler(30, 0, 0, TimeUnit.SECONDS));
-//                        pipeline.addLast(new RpcMessageEncoder());
-//                        pipeline.addLast(new RpcMessageDecoder());
+                        pipeline.addLast(new RpcMessageEncoder());
+                        pipeline.addLast(new RpcMessageDecoder());
                         pipeline.addLast(new NettyClientHandler());
                     }
                 });
-        serviceDiscovery = null;
     }
 
     @SneakyThrows
@@ -78,16 +79,27 @@ public class NettyClient implements Client, RpcRequestTransport {
     }
 
     @Override
+    @SneakyThrows
     public CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest rpcRequest) {
         CompletableFuture<RpcResponse> completableFuture = new CompletableFuture<>();
 
-        InetSocketAddress inetSocketAddress = serviceDiscovery.lookup(rpcRequest);
+        InetSocketAddress inetSocketAddress = RpcContextFactory.getRpcContext().getDefaultServiceDiscovery().lookup(rpcRequest);
+        if (inetSocketAddress == null) {
+            log.error("service {} get failed", rpcRequest.getServiceName());
+            return completableFuture;
+        }
 
         Channel channel = getChannel(inetSocketAddress);
         if (channel.isActive()) {
             CompletableRequest.put(rpcRequest.getRequestId(), completableFuture);
-            channel.writeAndFlush(rpcRequest);
+            RpcMessage rpcMessage = new RpcMessage(rpcRequest);
+            if (channel.isWritable()) {
+                channel.writeAndFlush(rpcMessage);
+            } else {
+                log.warn("发送消息队列busy，已达到最高水位，发送失败");
+            }
         } else {
+            ChannelClient.remove(inetSocketAddress);
             log.error("channel is not active");
         }
 
