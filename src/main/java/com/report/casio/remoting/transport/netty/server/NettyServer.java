@@ -1,5 +1,6 @@
 package com.report.casio.remoting.transport.netty.server;
 
+import com.report.casio.config.RpcContextFactory;
 import com.report.casio.remoting.transport.netty.codec.RpcMessageDecoder;
 import com.report.casio.remoting.transport.netty.codec.RpcMessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
@@ -19,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class NettyServer implements Server {
-    private static final int PORT = 9001;
+    private static final int PORT = RpcContextFactory.getRpcContext().getProviderConfig().getPort();
     private final ServerBootstrap bootstrap;
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workGroup;
