@@ -22,7 +22,7 @@ public class RpcContext {
     private final List<RegistryConfig> registryConfigs = new ArrayList<>();
     private final Map<String, Object> beanMap = new ConcurrentHashMap<>();
 
-    private final ProviderConfig providerConfig = new ProviderConfig(9001);
+    private final ProviderConfig providerConfig = new ProviderConfig(9002);
     private final ConsumerConfig consumerConfig = new ConsumerConfig();
 
     // 测试
