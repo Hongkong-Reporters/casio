@@ -1,5 +1,6 @@
 package com.report.casio.config;
 
+import com.report.casio.common.extension.ExtensionLoader;
 import com.report.casio.common.utils.AnnScanUtils;
 import com.report.casio.registry.ServiceDiscovery;
 import com.report.casio.registry.ServiceRegistry;
@@ -7,6 +8,7 @@ import com.report.casio.registry.zookeeper.ZkServiceDiscovery;
 import com.report.casio.registry.zookeeper.ZkServiceRegistry;
 import com.report.casio.rpc.cluster.loadbalance.LoadBalance;
 import com.report.casio.rpc.cluster.loadbalance.RoundLoadBalance;
+import lombok.SneakyThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,8 +26,9 @@ public class RpcContext {
     private Map<String, Object> beanMap = new ConcurrentHashMap<>();
 
     // 测试
+    @SneakyThrows
     public RpcContext() {
-        defaultLoadBalance = new RoundLoadBalance();
+        defaultLoadBalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getDefaultExtension();
 
         defaultServiceDiscovery = new ZkServiceDiscovery();
 

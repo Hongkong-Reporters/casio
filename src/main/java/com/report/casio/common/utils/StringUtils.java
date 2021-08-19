@@ -11,6 +11,10 @@ public class StringUtils {
         return s == null || s.isEmpty() || s.trim().isEmpty();
     }
 
+    public static boolean isNotBlank(String s) {
+        return !isBlank(s);
+    }
+
     public static String generateProviderPath(String serviceName) {
         return ZK_SEPARATOR + Constants.PROJECT +
                 ZK_SEPARATOR + serviceName +

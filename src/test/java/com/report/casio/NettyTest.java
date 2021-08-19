@@ -14,7 +14,7 @@ public class NettyTest {
     }
 
     @Test
-    public void testClient() throws InterruptedException {
+    public void testClient() {
         NettyClient client = new NettyClient();
         InetSocketAddress inetSocketAddress = InetSocketAddress.createUnresolved("10.1.83.189", 9001);
         client.doConnect(inetSocketAddress);

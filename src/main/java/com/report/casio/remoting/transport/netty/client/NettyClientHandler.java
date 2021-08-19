@@ -14,6 +14,14 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 public class NettyClientHandler extends ChannelInboundHandlerAdapter {
 
+    @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        super.channelActive(ctx);
+        log.info("client connect success");
+        // 设置最高水位，防止高并发出现内存泄露
+        ctx.channel().config().setWriteBufferLowWaterMark(20 * 1024 * 1024);
+    }
+
     @SneakyThrows
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {

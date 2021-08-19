@@ -95,7 +95,11 @@ public class NettyClient implements Client, RpcRequestTransport {
             CompletableRequest.put(rpcRequest.getRequestId(), completableFuture);
             RpcMessage rpcMessage = new RpcMessage();
             rpcMessage.setContent(ByteUtils.objectToBytes(rpcRequest));
-            channel.writeAndFlush(rpcMessage);
+            if (channel.isWritable()) {
+                channel.writeAndFlush(rpcMessage);
+            } else {
+                log.warn("发送消息队列busy，已达到最高水位，发送失败");
+            }
         } else {
             log.error("channel is not active");
         }
