@@ -104,3 +104,14 @@ NettyClient：消费者比较复杂，首先你需要拿到对应IP的 Channel�
 + 目前消息传递使用序列化和对象转byte数组实现，可以考虑其他，例：kyro、protobuff（GRPC）
 + 启动的信息不知道该如何加载和放置，目前全部堆积在 config 下，存在一定问题。
 + 配置文件的读取也没有实现，目前zookeeper等配置信息都是写死的
+
+
+
+#### 参考
+
+参考阿里文章：https://zhuanlan.zhihu.com/p/388848964
+
+dubbo项目：https://github.com/apache/dubbo
+
+几位大佬自己实现的RPC框架（相比我的完善许多，给我提供了许多思路）：https://github.com/Snailclimb/guide-rpc-framework
+
