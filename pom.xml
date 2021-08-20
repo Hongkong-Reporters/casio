@@ -45,6 +45,13 @@
             <version>1.7.25</version>
         </dependency>
 
+        <!--序列化工具-->
+        <dependency>
+            <groupId>com.esotericsoftware</groupId>
+            <artifactId>kryo</artifactId>
+            <version>5.2.0</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
