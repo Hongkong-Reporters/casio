@@ -37,6 +37,7 @@ public class RpcClientProxy implements RpcProxy, InvocationHandler {
                 .parameters(args)
                 .build();
         try {
+            // todo 添加重试机制，按照dubbo采用for循环实现（多个依赖幂等的增加）
             RpcResponse rpcResponse = transport.sendRpcRequest(request).get();
             CompletableRequest.remove(rpcResponse.getRequestId());
             return rpcResponse.getResult();
