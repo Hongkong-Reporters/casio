@@ -26,6 +26,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (msg instanceof RpcMessage) {
+            long startTime = System.currentTimeMillis();
             RpcMessage rpcMessage = (RpcMessage) msg;
             RpcRequest request;
             if (rpcMessage.getType() == ProtocolConstants.REQUEST_TYPE) {
@@ -45,8 +46,12 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                 rpcResponse.setRequestId(request.getRequestId());
                 RpcMessage resMessage = new RpcMessage(rpcResponse);
                 ctx.writeAndFlush(resMessage);
+                log.info("server read success request {}, and execute success", request);
             }
-            log.info("server read success request, {}", request);
+            long executeTime = System.currentTimeMillis() - startTime;
+            if (executeTime > RpcContextFactory.getRpcContext().getProviderConfig().getTimeout()) {
+                log.warn("server execute timeout, {}", executeTime);
+            }
         } else {
             log.info("server read error msg, {}", msg);
         }
