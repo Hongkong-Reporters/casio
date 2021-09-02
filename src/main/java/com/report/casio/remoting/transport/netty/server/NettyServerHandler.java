@@ -1,5 +1,6 @@
 package com.report.casio.remoting.transport.netty.server;
 
+import com.report.casio.common.exception.RpcException;
 import com.report.casio.common.utils.ByteUtils;
 import com.report.casio.config.RpcContextFactory;
 import com.report.casio.domain.RpcMessage;
@@ -39,14 +40,23 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             if (service == null) {
                 log.error("service Impl not exist, serviceName: {}", request.getServiceName());
             } else {
-                Method method = service.getClass().getMethod(request.getMethodName(), request.getParameterTypes());
-                Object result = method.invoke(service, request.getParameters());
-                RpcResponse rpcResponse = new RpcResponse();
-                rpcResponse.setResult(result);
-                rpcResponse.setRequestId(request.getRequestId());
-                RpcMessage resMessage = new RpcMessage(rpcResponse);
-                ctx.writeAndFlush(resMessage);
-                log.info("server read success request {}, and execute success", request);
+                try {
+                    Method method = service.getClass().getMethod(request.getMethodName(), request.getParameterTypes());
+                    Object result = method.invoke(service, request.getParameters());
+                    RpcResponse rpcResponse = new RpcResponse();
+                    rpcResponse.setResult(result);
+                    rpcResponse.setRequestId(request.getRequestId());
+                    RpcMessage resMessage = new RpcMessage(rpcResponse);
+                    ctx.writeAndFlush(resMessage);
+                    log.info("server read success request {}, and execute success", request);
+                } catch (Exception e) {
+                    RpcException exception = new RpcException("server run error, msg: " + rpcMessage, e);
+                    RpcResponse rpcResponse = new RpcResponse();
+                    rpcResponse.setRequestId(request.getRequestId());
+                    rpcResponse.setException(exception);
+                    RpcMessage resMessage = new RpcMessage(rpcResponse);
+                    ctx.writeAndFlush(resMessage);
+                }
             }
             long executeTime = System.currentTimeMillis() - startTime;
             if (executeTime > RpcContextFactory.getRpcContext().getProviderConfig().getTimeout()) {

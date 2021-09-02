@@ -36,8 +36,13 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
                 return;
             }
             log.info("client read success response, {}", rpcResponse);
-            CompletableFuture<RpcResponse> completableFuture = CompletableRequest.get(rpcResponse.getRequestId());
-            completableFuture.complete(rpcResponse);
+            Throwable exception = rpcResponse.getException();
+            if (exception != null) {
+                exception.printStackTrace();
+            } else {
+                CompletableFuture<RpcResponse> completableFuture = CompletableRequest.get(rpcResponse.getRequestId());
+                completableFuture.complete(rpcResponse);
+            }
         } else {
             log.error("client read error msg, {}", msg);
         }
