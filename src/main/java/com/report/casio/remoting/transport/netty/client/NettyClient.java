@@ -1,10 +1,11 @@
 package com.report.casio.remoting.transport.netty.client;
 
 import com.report.casio.common.exception.RemotingException;
-import com.report.casio.config.RpcContextFactory;
+import com.report.casio.common.extension.ExtensionLoader;
 import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
+import com.report.casio.registry.ServiceDiscovery;
 import com.report.casio.remoting.transport.netty.RpcRequestTransport;
 import com.report.casio.remoting.transport.netty.client.cache.ChannelClient;
 import com.report.casio.remoting.transport.netty.client.cache.CompletableRequest;
@@ -83,7 +84,8 @@ public class NettyClient implements Client, RpcRequestTransport {
     public CompletableFuture<RpcResponse> sendRpcRequest(RpcRequest rpcRequest) {
         CompletableFuture<RpcResponse> completableFuture = new CompletableFuture<>();
 
-        InetSocketAddress inetSocketAddress = RpcContextFactory.getRpcContext().getDefaultServiceDiscovery().lookup(rpcRequest);
+        ServiceDiscovery serviceDiscovery = ExtensionLoader.getExtensionLoader(ServiceDiscovery.class).getDefaultExtension();
+        InetSocketAddress inetSocketAddress = serviceDiscovery.lookup(rpcRequest);
         if (inetSocketAddress == null) {
             log.error("service {} get failed", rpcRequest.getServiceName());
             return completableFuture;

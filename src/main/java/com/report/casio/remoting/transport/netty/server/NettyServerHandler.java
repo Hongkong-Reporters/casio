@@ -2,7 +2,7 @@ package com.report.casio.remoting.transport.netty.server;
 
 import com.report.casio.common.exception.RpcException;
 import com.report.casio.common.utils.ByteUtils;
-import com.report.casio.config.RpcContextFactory;
+import com.report.casio.config.context.RpcContextFactory;
 import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
@@ -36,7 +36,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                 log.info("server read error msg type, {}", rpcMessage);
                 return;
             }
-            Object service = RpcContextFactory.getRpcContext().getBean(request.getServiceName());
+            Object service = RpcContextFactory.getBeanContext().getBean(request.getServiceName());
             if (service == null) {
                 log.error("service Impl not exist, serviceName: {}", request.getServiceName());
             } else {
@@ -59,7 +59,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                 }
             }
             long executeTime = System.currentTimeMillis() - startTime;
-            if (executeTime > RpcContextFactory.getRpcContext().getProviderConfig().getTimeout()) {
+            if (executeTime > RpcContextFactory.getConfigContext().getProviderConfig().getTimeout()) {
                 log.warn("server execute timeout, {}", executeTime);
             }
         } else {

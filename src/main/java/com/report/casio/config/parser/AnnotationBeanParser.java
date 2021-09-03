@@ -1,6 +1,7 @@
-package com.report.casio.common.utils;
+package com.report.casio.config.parser;
 
 import com.report.casio.common.annotation.Register;
+import com.report.casio.common.utils.StringUtils;
 import com.report.casio.config.ServiceConfig;
 import lombok.extern.slf4j.Slf4j;
 
@@ -11,13 +12,11 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
-// 注解扫描类
-// 通过方法的形式扫描，是否存在问题
 @Slf4j
-public class AnnScanUtils {
+public class AnnotationBeanParser {
     private static final String CLASS_SUFFIX = ".class";
 
-    private AnnScanUtils() {}
+    private AnnotationBeanParser() {}
 
     public static Set<ServiceConfig> scanRegisterService(String packageName) throws ClassNotFoundException {
         Set<ServiceConfig> res = new HashSet<>();
@@ -66,7 +65,7 @@ public class AnnScanUtils {
         }
 
         String packagePath = packageName.replace(".", "/");
-        URL resource = AnnScanUtils.class.getClassLoader().getResource(packagePath);
+        URL resource = AnnotationBeanParser.class.getClassLoader().getResource(packagePath);
         if (resource == null) {
             log.error("资源不存在：" + packageName);
             return res;
@@ -108,5 +107,4 @@ public class AnnScanUtils {
     private static boolean isClassPath(String path) {
         return !StringUtils.isBlank(path) && path.contains(CLASS_SUFFIX);
     }
-
 }

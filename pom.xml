@@ -52,6 +52,13 @@
             <version>5.2.0</version>
         </dependency>
 
+        <!--yaml parser-->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.29</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
