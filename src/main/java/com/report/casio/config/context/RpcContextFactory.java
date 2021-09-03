@@ -22,8 +22,10 @@ public class RpcContextFactory {
                     configContext = new RpcConfigContext();
                     configContext.setProviderConfig(providerConfig);
                     configContext.setConsumerConfig(consumerConfig);
-                    registryConfigs.forEach(registryConfig -> configContext.addRegistryConfig(registryConfig));
-                    serviceConfigs.forEach(serviceConfig -> configContext.addServiceConfig(serviceConfig));
+                    if (registryConfigs != null && !registryConfigs.isEmpty())
+                        registryConfigs.forEach(registryConfig -> configContext.addRegistryConfig(registryConfig));
+                    if (serviceConfigs != null && !serviceConfigs.isEmpty())
+                        serviceConfigs.forEach(serviceConfig -> configContext.addServiceConfig(serviceConfig));
                 }
             }
         }
