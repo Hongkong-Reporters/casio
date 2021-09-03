@@ -1,11 +1,13 @@
 package com.report.casio.registry.zookeeper;
 
+import com.report.casio.common.extension.ExtensionLoader;
 import com.report.casio.common.utils.StringUtils;
 import com.report.casio.config.RegistryConfig;
-import com.report.casio.config.RpcContextFactory;
+import com.report.casio.config.context.RpcContextFactory;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.registry.ServiceDiscovery;
 import com.report.casio.registry.cache.ConsumerServiceDiscoveryCache;
+import com.report.casio.rpc.cluster.loadbalance.LoadBalance;
 
 import java.net.InetSocketAddress;
 import java.util.ArrayList;
@@ -24,7 +26,7 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
                 hosts = ConsumerServiceDiscoveryCache.get(path);
             } else {
                 Set<String> childNode = new HashSet<>();
-                for (RegistryConfig registryConfig : RpcContextFactory.getRpcContext().getRegistryConfigs()) {
+                for (RegistryConfig registryConfig : RpcContextFactory.getConfigContext().getRegistryConfigs()) {
                     childNode.addAll(ZkUtils.getChildNode(registryConfig.getHost(), path));
                     // 添加watch，如果child node发生变化，删除cache信息
                     ZkUtils.addNodeWatcher(registryConfig.getHost(), path);
@@ -32,7 +34,8 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
                 hosts = new ArrayList<>(childNode);
                 ConsumerServiceDiscoveryCache.put(path, hosts);
             }
-            String hostname = RpcContextFactory.getRpcContext().getDefaultLoadBalance().select(hosts, rpcRequest.getServiceName());
+            LoadBalance loadBalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getDefaultExtension();
+            String hostname = loadBalance.select(hosts, rpcRequest.getServiceName());
             if (StringUtils.isBlank(hostname)) {
                 return null;
             }
