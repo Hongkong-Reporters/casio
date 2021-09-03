@@ -12,8 +12,9 @@ public class BeanContext {
     private final Map<String, Object> beanMap = new ConcurrentHashMap<>();
 
     protected BeanContext() {
+        String path = RpcContextFactory.getConfigContext().getProviderConfig().getServiceScanPackage();
         try {
-            for (ServiceConfig serviceConfig : AnnotationBeanParser.scanRegisterService("com.report.casio.test")) {
+            for (ServiceConfig serviceConfig : AnnotationBeanParser.scanRegisterService(path)) {
                 beanMap.putIfAbsent(serviceConfig.getServiceName(), Class.forName(serviceConfig.getRef()).newInstance());
             }
         } catch (Exception e) {

@@ -3,6 +3,7 @@ package com.report.casio.test.starter;
 import com.report.casio.common.Constants;
 import com.report.casio.common.extension.ExtensionLoader;
 import com.report.casio.config.ServiceConfig;
+import com.report.casio.config.context.RpcContextFactory;
 import com.report.casio.config.parser.AnnotationBeanParser;
 import com.report.casio.config.parser.ConfigParser;
 import com.report.casio.registry.ServiceRegistry;
@@ -22,7 +23,8 @@ public class ProviderStarter implements CasioStarter {
         ConfigParser extension = ExtensionLoader.getExtensionLoader(ConfigParser.class).getDefaultExtension();
         extension.parse(Constants.DEFAULT_CONFIG_PATH);
 
-        Set<ServiceConfig> serviceConfigs = AnnotationBeanParser.scanRegisterService("com.report.casio.test");
+        String path = RpcContextFactory.getConfigContext().getProviderConfig().getServiceScanPackage();
+        Set<ServiceConfig> serviceConfigs = AnnotationBeanParser.scanRegisterService(path);
         ServiceRegistry serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getDefaultExtension();
         for (ServiceConfig serviceConfig : serviceConfigs) {
             serviceRegistry.register(serviceConfig);

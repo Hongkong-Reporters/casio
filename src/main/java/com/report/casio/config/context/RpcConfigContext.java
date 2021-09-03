@@ -4,7 +4,6 @@ import com.report.casio.config.ConsumerConfig;
 import com.report.casio.config.ProviderConfig;
 import com.report.casio.config.RegistryConfig;
 import com.report.casio.config.ServiceConfig;
-import lombok.SneakyThrows;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +14,6 @@ public class RpcConfigContext {
     private ConsumerConfig consumerConfig;
     private final List<ServiceConfig> serviceConfigs;
 
-    @SneakyThrows
     protected RpcConfigContext() {
         registryConfigs = new ArrayList<>();
         serviceConfigs = new ArrayList<>();
