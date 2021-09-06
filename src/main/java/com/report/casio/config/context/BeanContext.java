@@ -8,12 +8,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 // 存储service的bean信息
 public class BeanContext {
-
+    private String serviceScanPackage = "";
     private final Map<String, Object> beanMap = new ConcurrentHashMap<>();
 
-    protected BeanContext() {
+    protected BeanContext() { }
+
+    public void init() {
         try {
-            for (ServiceConfig serviceConfig : AnnotationBeanParser.scanRegisterService("com.report.casio.test")) {
+            for (ServiceConfig serviceConfig : AnnotationBeanParser.scanRegisterService(serviceScanPackage)) {
                 beanMap.putIfAbsent(serviceConfig.getServiceName(), Class.forName(serviceConfig.getRef()).newInstance());
             }
         } catch (Exception e) {
@@ -29,4 +31,11 @@ public class BeanContext {
         return beanMap.get(clazz.getName());
     }
 
+    public String getServiceScanPackage() {
+        return serviceScanPackage;
+    }
+
+    public void setServiceScanPackage(String serviceScanPackage) {
+        this.serviceScanPackage = serviceScanPackage;
+    }
 }

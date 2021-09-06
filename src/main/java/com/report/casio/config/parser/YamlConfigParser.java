@@ -28,6 +28,7 @@ public class YamlConfigParser implements ConfigParser {
         Map<String, Object> obj = yaml.load(inputStream);
 
         int providerPort = Constants.DEFAULT_PROVIDER_PORT;
+        int providerTimeout = Constants.DEFAULT_TIMEOUT;
         String registryAddress = Constants.DEFAULT_REGISTRY_ADDRESS;
         int registryPort = Constants.DEFAULT_REGISTRY_PORT;
 
@@ -48,10 +49,13 @@ public class YamlConfigParser implements ConfigParser {
                     if (registryConfig.containsKey(Constants.PORT)) {
                         registryPort = Integer.parseInt(registryConfig.get(Constants.PORT).toString());
                     }
+                    if (registryConfig.containsKey(Constants.TIMEOUT)) {
+                        providerTimeout = Integer.parseInt(registryConfig.get(Constants.TIMEOUT).toString());
+                    }
                 }
             }
 
-            ProviderConfig providerConfig = new ProviderConfig(providerPort);
+            ProviderConfig providerConfig = new ProviderConfig(providerPort, providerTimeout);
             ConsumerConfig consumerConfig = new ConsumerConfig();
             RegistryConfig registryConfig = new RegistryConfig();
             registryConfig.setAddress(registryAddress);

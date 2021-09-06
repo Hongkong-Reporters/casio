@@ -16,6 +16,11 @@ public class ProviderConfig {
         this.port = port;
     }
 
+    public ProviderConfig(int port, int timeout) {
+        this(port);
+        this.timeout = timeout;
+    }
+
     public String getHost() {
         return this.address + ":" + port;
     }
@@ -24,11 +29,8 @@ public class ProviderConfig {
         return port;
     }
 
-    protected void setTimeout(int timeout) {
-        this.timeout = timeout;
-    }
-
     public int getTimeout() {
         return timeout;
     }
+
 }

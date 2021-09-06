@@ -11,20 +11,21 @@ public class RpcContextFactory {
     private static RpcConfigContext configContext;
     private static final BeanContext beanContext = new BeanContext();
 
-    private RpcContextFactory() {}
+    private RpcContextFactory() {
+    }
 
     public static void createConfigContext(ProviderConfig providerConfig, ConsumerConfig consumerConfig,
                                            List<RegistryConfig> registryConfigs, List<ServiceConfig> serviceConfigs) {
         if (configContext == null) {
             // 饿汉模式双空指针判断
             synchronized (RpcContextFactory.class) {
-                if (configContext == null) {
-                    configContext = new RpcConfigContext();
-                    configContext.setProviderConfig(providerConfig);
-                    configContext.setConsumerConfig(consumerConfig);
+                configContext = new RpcConfigContext();
+                configContext.setProviderConfig(providerConfig);
+                configContext.setConsumerConfig(consumerConfig);
+                if (registryConfigs != null && !registryConfigs.isEmpty())
                     registryConfigs.forEach(registryConfig -> configContext.addRegistryConfig(registryConfig));
+                if (serviceConfigs != null && !serviceConfigs.isEmpty())
                     serviceConfigs.forEach(serviceConfig -> configContext.addServiceConfig(serviceConfig));
-                }
             }
         }
     }
