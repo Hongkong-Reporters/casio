@@ -7,8 +7,10 @@ public class Constants {
     public static final String PROVIDER = "provider";
     public static final String CONSUMER = "consumer";
     public static final String REGISTRY = "registry";
+
     public static final String ADDRESS = "address";
     public static final String PORT = "port";
+    public static final String TIMEOUT = "timeout";
 
     public static final int DEFAULT_TIMEOUT = 3000;
     public static final int DEFAULT_RETIES = 2;
