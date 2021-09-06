@@ -12,6 +12,7 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 
 @Slf4j
@@ -38,7 +39,11 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             }
             Object service = RpcContextFactory.getBeanContext().getBean(request.getServiceName());
             if (service == null) {
-                log.error("service Impl not exist, serviceName: {}", request.getServiceName());
+                String errorMsg = "service Impl not exist, serviceName: " + request.getServiceName();
+                log.error(errorMsg);
+                RpcException exception = new RpcException(errorMsg);
+                exception.setRequestId(request.getRequestId());
+                throw exception;
             } else {
                 try {
                     Method method = service.getClass().getMethod(request.getMethodName(), request.getParameterTypes());
@@ -51,11 +56,8 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                     log.info("server read success request {}, and execute success", request);
                 } catch (Exception e) {
                     RpcException exception = new RpcException("server run error, msg: " + rpcMessage, e);
-                    RpcResponse rpcResponse = new RpcResponse();
-                    rpcResponse.setRequestId(request.getRequestId());
-                    rpcResponse.setException(exception);
-                    RpcMessage resMessage = new RpcMessage(rpcResponse);
-                    ctx.writeAndFlush(resMessage);
+                    exception.setRequestId(request.getRequestId());
+                    throw exception;
                 }
             }
             long executeTime = System.currentTimeMillis() - startTime;
@@ -75,9 +77,15 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        log.error("");
-        super.exceptionCaught(ctx, cause);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws IOException {
+        if (cause instanceof RpcException) {
+            RpcException exception = (RpcException) cause;
+            RpcResponse rpcResponse = new RpcResponse();
+            rpcResponse.setRequestId(exception.getRequestId());
+            rpcResponse.setException(exception);
+            RpcMessage resMessage = new RpcMessage(rpcResponse);
+            ctx.writeAndFlush(resMessage);
+        }
     }
 
 }

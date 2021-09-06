@@ -1,17 +1,21 @@
 package com.report.casio.common.exception;
 
 public class RpcException extends RuntimeException {
-    private int code;
+    private String requestId;
 
     public RpcException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public RpcException(int code) {
-        this.code = code;
+    public RpcException(String msg) {
+        super(msg);
     }
 
-    public int getCode() {
-        return code;
+    public void setRequestId(String requestId) {
+        this.requestId = requestId;
+    }
+
+    public String getRequestId() {
+        return requestId;
     }
 }

@@ -9,7 +9,6 @@ public class ProviderConfig {
     private final String address;
     private final int port;
     private int timeout = Constants.DEFAULT_TIMEOUT;
-    private String serviceScanPackage;
 
     @SneakyThrows
     public ProviderConfig(int port) {
@@ -34,11 +33,4 @@ public class ProviderConfig {
         return timeout;
     }
 
-    public String getServiceScanPackage() {
-        return serviceScanPackage;
-    }
-
-    public void setServiceScanPackage(String serviceScanPackage) {
-        this.serviceScanPackage = serviceScanPackage;
-    }
 }

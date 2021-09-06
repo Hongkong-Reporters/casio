@@ -1,11 +1,10 @@
 package com.report.casio.test.starter;
 
-import com.report.casio.common.Constants;
 import com.report.casio.common.extension.ExtensionLoader;
+import com.report.casio.config.CasioConfigInitHandler;
 import com.report.casio.config.ServiceConfig;
 import com.report.casio.config.context.RpcContextFactory;
 import com.report.casio.config.parser.AnnotationBeanParser;
-import com.report.casio.config.parser.ConfigParser;
 import com.report.casio.registry.ServiceRegistry;
 import com.report.casio.remoting.transport.netty.server.NettyServer;
 import com.report.casio.remoting.transport.netty.server.Server;
@@ -20,10 +19,9 @@ public class ProviderStarter implements CasioStarter {
     @SneakyThrows
     @Override
     public void start() {
-        ConfigParser extension = ExtensionLoader.getExtensionLoader(ConfigParser.class).getDefaultExtension();
-        extension.parse(Constants.DEFAULT_CONFIG_PATH);
+        new CasioConfigInitHandler().init();
 
-        String path = RpcContextFactory.getConfigContext().getProviderConfig().getServiceScanPackage();
+        String path = RpcContextFactory.getBeanContext().getServiceScanPackage();
         Set<ServiceConfig> serviceConfigs = AnnotationBeanParser.scanRegisterService(path);
         ServiceRegistry serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getDefaultExtension();
         for (ServiceConfig serviceConfig : serviceConfigs) {
