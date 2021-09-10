@@ -16,7 +16,8 @@ import java.util.Set;
 public class AnnotationBeanParser {
     private static final String CLASS_SUFFIX = ".class";
 
-    private AnnotationBeanParser() {}
+    private AnnotationBeanParser() {
+    }
 
     public static Set<ServiceConfig> scanRegisterService(String packageName) throws ClassNotFoundException {
         Set<ServiceConfig> res = new HashSet<>();
@@ -42,7 +43,8 @@ public class AnnotationBeanParser {
 
     /**
      * 查询指定包下指定注解修饰的类，可以参考Spring的PackageScan
-     * @param packageName 包名
+     *
+     * @param packageName     包名
      * @param annotationClass 注解Class
      */
     public static Set<Class<?>> scan(String packageName, Class<? extends Annotation> annotationClass) throws ClassNotFoundException {
