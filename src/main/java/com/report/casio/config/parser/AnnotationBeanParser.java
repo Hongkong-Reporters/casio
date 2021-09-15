@@ -16,8 +16,11 @@ import java.util.Set;
 public class AnnotationBeanParser {
     private static final String CLASS_SUFFIX = ".class";
 
-    private AnnotationBeanParser() {}
+    private AnnotationBeanParser() {
+    }
 
+    // 调用接口时，需要注意class反射调用时，如果使用了static的属性，且调用了其他类，如果调用类未生成对象，会产生Error（注意不是Exception）
+    // 因此调用该方法存在顺序问题，需要思考其他被调用类是否已经生成
     public static Set<ServiceConfig> scanRegisterService(String packageName) throws ClassNotFoundException {
         Set<ServiceConfig> res = new HashSet<>();
 
@@ -42,7 +45,8 @@ public class AnnotationBeanParser {
 
     /**
      * 查询指定包下指定注解修饰的类，可以参考Spring的PackageScan
-     * @param packageName 包名
+     *
+     * @param packageName     包名
      * @param annotationClass 注解Class
      */
     public static Set<Class<?>> scan(String packageName, Class<? extends Annotation> annotationClass) throws ClassNotFoundException {
