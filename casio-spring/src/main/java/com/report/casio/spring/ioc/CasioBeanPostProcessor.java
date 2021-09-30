@@ -18,7 +18,7 @@ import java.lang.reflect.Field;
 @Slf4j
 @Component
 public class CasioBeanPostProcessor implements BeanPostProcessor {
-    private NettyClient client = new NettyClient();
+    private final NettyClient client = new NettyClient();
 
     @Override
     @SneakyThrows
@@ -26,7 +26,7 @@ public class CasioBeanPostProcessor implements BeanPostProcessor {
         Class<?> clazz = bean.getClass();
         if (clazz.isAnnotationPresent(Register.class)) {
             ServiceRegistry serviceRegistry = ExtensionLoader.getExtensionLoader(ServiceRegistry.class).getDefaultExtension();
-            ServiceConfig serviceConfig = new ServiceConfig.Builder()
+            ServiceConfig serviceConfig = ServiceConfig.builder()
                     .serviceName(clazz)
                     .ref(clazz.getName())
                     .version(clazz.getAnnotation(Register.class).version())

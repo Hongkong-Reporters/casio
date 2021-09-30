@@ -62,6 +62,10 @@ public class ServiceConfig {
 
     }
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     public String getVersion() {
         return version;
     }

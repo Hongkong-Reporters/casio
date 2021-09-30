@@ -28,7 +28,7 @@ public class AnnotationBeanParser {
         for (Class<?> clazz : classes) {
             Register register = clazz.getAnnotation(Register.class);
             if (register != null) {
-                ServiceConfig serviceConfig = new ServiceConfig.Builder()
+                ServiceConfig serviceConfig = ServiceConfig.builder()
                         .serviceName(clazz)
                         .ref(clazz.getName())
                         .version(register.version())

@@ -31,6 +31,7 @@ public class RpcClientProxy implements RpcProxy, InvocationHandler {
 
     @Override
     @SuppressWarnings("unchecked")
+    // todo：没有添加version
     public <T> T getProxy(Class<T> clazz) {
         this.clazz = clazz;
         return (T) Proxy.newProxyInstance(clazz.getClassLoader(), new Class[]{clazz}, this);
