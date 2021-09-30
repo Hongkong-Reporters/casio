@@ -16,6 +16,10 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Field;
 
 @Slf4j
+/*
+ * spring 后置处理器
+ * 处理Bean对象在实例化和依赖注入后，在显示调用初始化方法前的自定义逻辑
+ */
 @Component
 public class CasioBeanPostProcessor implements BeanPostProcessor {
     private final NettyClient client = new NettyClient();
