@@ -28,14 +28,11 @@ public class AnnotationBeanParser {
         for (Class<?> clazz : classes) {
             Register register = clazz.getAnnotation(Register.class);
             if (register != null) {
-                ServiceConfig serviceConfig = new ServiceConfig();
-                serviceConfig.setVersion(register.version());
-                serviceConfig.setRef(clazz.getName());
-                if (register.interfaceClass().equals(void.class)) {
-                    serviceConfig.setServiceName(clazz.getInterfaces()[0].getName());
-                } else {
-                    serviceConfig.setServiceName(register.interfaceClass().getName());
-                }
+                ServiceConfig serviceConfig = new ServiceConfig.Builder()
+                        .serviceName(clazz)
+                        .ref(clazz.getName())
+                        .version(register.version())
+                        .build();
                 res.add(serviceConfig);
             }
         }
