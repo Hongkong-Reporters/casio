@@ -5,11 +5,13 @@ import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcResponse;
 import com.report.casio.remoting.transport.netty.client.cache.CompletableRequest;
 import com.report.casio.rpc.protocol.ProtocolConstants;
+import com.report.casio.timer.WheelTimerJob;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -31,6 +33,10 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             RpcResponse rpcResponse;
             if (rpcMessage.getType() == ProtocolConstants.RESPONSE_TYPE) {
                 rpcResponse = (RpcResponse) ByteUtils.bytesToObject(rpcMessage.getContent());
+                WheelTimerJob.getInstance().setClientLastRead(ctx.channel(), System.currentTimeMillis());
+            } else if (rpcMessage.getType() == ProtocolConstants.HEARTBEAT) {
+                log.info("client receive heart beat, time: " + new Date());
+                return;
             } else {
                 log.error("client read error msg type, {}", rpcMessage);
                 return;

@@ -11,6 +11,7 @@ import com.report.casio.remoting.transport.netty.client.cache.ChannelClient;
 import com.report.casio.remoting.transport.netty.client.cache.CompletableRequest;
 import com.report.casio.remoting.transport.netty.codec.RpcMessageDecoder;
 import com.report.casio.remoting.transport.netty.codec.RpcMessageEncoder;
+import com.report.casio.timer.WheelTimerJob;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -93,6 +94,7 @@ public class NettyClient implements Client, RpcRequestTransport {
 
         Channel channel = getChannel(inetSocketAddress);
         if (channel.isActive()) {
+            WheelTimerJob.getInstance().setClientLastWrite(channel, System.currentTimeMillis());
             CompletableRequest.put(rpcRequest.getRequestId(), completableFuture);
             RpcMessage rpcMessage = new RpcMessage(rpcRequest);
             log.info("send message to {}", inetSocketAddress);

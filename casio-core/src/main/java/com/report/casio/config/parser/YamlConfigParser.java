@@ -7,7 +7,6 @@ import com.report.casio.config.ProviderConfig;
 import com.report.casio.config.RegistryConfig;
 import com.report.casio.config.ServiceConfig;
 import com.report.casio.config.context.RpcContextFactory;
-import com.report.casio.test.YamlParserTest;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
 
@@ -22,7 +21,7 @@ public class YamlConfigParser implements ConfigParser {
     @Override
     public void parse(String path) throws ContextException {
         Yaml yaml = new Yaml();
-        InputStream inputStream = YamlParserTest.class
+        InputStream inputStream = YamlConfigParser.class
                 .getClassLoader()
                 .getResourceAsStream(path);
         Map<String, Object> obj = yaml.load(inputStream);

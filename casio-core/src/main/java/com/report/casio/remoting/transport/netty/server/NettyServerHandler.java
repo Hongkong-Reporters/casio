@@ -7,6 +7,7 @@ import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
 import com.report.casio.rpc.protocol.ProtocolConstants;
+import com.report.casio.timer.WheelTimerJob;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.SneakyThrows;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.util.Date;
 
 @Slf4j
 public class NettyServerHandler extends ChannelInboundHandlerAdapter {
@@ -33,6 +35,9 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             RpcRequest request;
             if (rpcMessage.getType() == ProtocolConstants.REQUEST_TYPE) {
                 request = (RpcRequest) ByteUtils.bytesToObject(rpcMessage.getContent());
+            } else if (rpcMessage.getType() == ProtocolConstants.HEARTBEAT) {
+                log.info("server receive heart beat, time: " + new Date());
+                return;
             } else {
                 log.info("server read error msg type, {}", rpcMessage);
                 return;

@@ -3,6 +3,7 @@ package com.report.casio.remoting.transport.netty.client.cache;
 import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -24,4 +25,7 @@ public class ChannelClient {
         channelMap.remove(inetSocketAddress);
     }
 
+    public static Collection<Channel> getAllChannels() {
+        return channelMap.values();
+    }
 }
