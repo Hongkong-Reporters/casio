@@ -20,10 +20,10 @@ public class ConsumerStarter implements CasioStarter {
         IDemoService service = new RpcClientProxy(client).getProxy(IDemoService.class);
         WheelTimerJob.getInstance().execute();
 
-//        for (int i = 0; i < 10; i++) {
+        for (int i = 0; i < 10; i++) {
             service.sayHello();
-//            Thread.sleep(10000);
-//        }
+            Thread.sleep(10000);
+        }
 
     }
 
