@@ -1,8 +1,10 @@
 package com.report.casio.remoting.transport.netty.client.cache;
 
+import com.report.casio.remoting.transport.netty.TimerChannel;
 import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
+import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -10,13 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ChannelClient {
     private ChannelClient() {}
 
-    private static final Map<InetSocketAddress, Channel> channelMap = new ConcurrentHashMap<>();
+    private static final Map<InetSocketAddress, TimerChannel> channelMap = new ConcurrentHashMap<>();
 
-    public static Channel get(InetSocketAddress inetSocketAddress) {
+    public static TimerChannel get(InetSocketAddress inetSocketAddress) {
         return channelMap.get(inetSocketAddress);
     }
 
-    public static void put(InetSocketAddress inetSocketAddress, Channel channel) {
+    public static void put(InetSocketAddress inetSocketAddress, TimerChannel channel) {
         channelMap.putIfAbsent(inetSocketAddress, channel);
     }
 
@@ -24,4 +26,7 @@ public class ChannelClient {
         channelMap.remove(inetSocketAddress);
     }
 
+    public static Collection<TimerChannel> getAllChannels() {
+        return channelMap.values();
+    }
 }

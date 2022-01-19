@@ -8,9 +8,10 @@ public class ProtocolConstants {
 
     public static final byte REQUEST_TYPE = 0x00;
     public static final byte RESPONSE_TYPE = 0x01;
+    public static final byte HEARTBEAT = 0x02;
 
-    // magic(1) + version (1) + type (1) + length (4) 共7个字节
-    public static final int MIN_LENGTH = 7;
+    // magic(1) + version (1) + type (4) + length (4) 共7个字节
+    public static final int MIN_LENGTH = 10;
 
     public static final int MAX_FRAME_LENGTH = 1024 * 1024;
 

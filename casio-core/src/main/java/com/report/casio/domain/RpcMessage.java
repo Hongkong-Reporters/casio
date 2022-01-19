@@ -9,7 +9,7 @@ import java.io.Serializable;
 
 @Data
 public class RpcMessage implements Serializable {
-    private byte type;
+    private int type;
     private byte version;
     private byte[] content;
 

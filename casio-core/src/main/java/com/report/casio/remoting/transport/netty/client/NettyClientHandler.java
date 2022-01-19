@@ -3,6 +3,7 @@ package com.report.casio.remoting.transport.netty.client;
 import com.report.casio.common.utils.ByteUtils;
 import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcResponse;
+import com.report.casio.remoting.transport.netty.client.cache.ChannelClient;
 import com.report.casio.remoting.transport.netty.client.cache.CompletableRequest;
 import com.report.casio.rpc.protocol.ProtocolConstants;
 import io.netty.channel.ChannelHandlerContext;
@@ -10,6 +11,8 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
+import java.net.InetSocketAddress;
+import java.util.Date;
 import java.util.concurrent.CompletableFuture;
 
 @Slf4j
@@ -31,6 +34,10 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             RpcResponse rpcResponse;
             if (rpcMessage.getType() == ProtocolConstants.RESPONSE_TYPE) {
                 rpcResponse = (RpcResponse) ByteUtils.bytesToObject(rpcMessage.getContent());
+                ChannelClient.get((InetSocketAddress) ctx.channel().remoteAddress()).setLastRead();
+            } else if (rpcMessage.getType() == ProtocolConstants.HEARTBEAT) {
+                log.info("client receive heart beat, time: " + new Date());
+                return;
             } else {
                 log.error("client read error msg type, {}", rpcMessage);
                 return;

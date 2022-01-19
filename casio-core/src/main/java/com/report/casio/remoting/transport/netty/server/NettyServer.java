@@ -14,7 +14,6 @@ import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
@@ -24,8 +23,14 @@ public class NettyServer implements Server {
     private final ServerBootstrap bootstrap;
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workGroup;
+    private static final NettyServer INSTANCE = new NettyServer();
+    private Channel channel;
 
-    public NettyServer() {
+    public static NettyServer getInstance() {
+        return INSTANCE;
+    }
+
+    private NettyServer() {
         this.bootstrap = new ServerBootstrap();
         this.bossGroup = new NioEventLoopGroup();
         this.workGroup = new NioEventLoopGroup();
@@ -53,7 +58,8 @@ public class NettyServer implements Server {
             String host = InetAddress.getLocalHost().getHostAddress();
             ChannelFuture future = bootstrap.bind(host, PORT).sync();
             // sync表示同步，线程会阻塞在此处
-            future.channel().closeFuture().sync();
+            this.channel = future.channel();
+            this.channel.closeFuture().sync();
         } catch (UnknownHostException | InterruptedException exception) {
             log.error("netty server open failed");
         } finally {
@@ -68,7 +74,7 @@ public class NettyServer implements Server {
     }
 
     @Override
-    public Channel getChannel(InetSocketAddress inetSocketAddress) {
-        return null;
+    public Channel getChannel() {
+        return channel;
     }
 }

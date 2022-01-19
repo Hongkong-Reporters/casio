@@ -2,12 +2,12 @@ package com.report.casio.remoting.transport.netty.client;
 
 import com.report.casio.common.exception.RemotingException;
 import com.report.casio.common.extension.ExtensionLoader;
-import com.report.casio.config.context.RpcContextFactory;
 import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
 import com.report.casio.registry.ServiceDiscovery;
 import com.report.casio.remoting.transport.netty.RpcRequestTransport;
+import com.report.casio.remoting.transport.netty.TimerChannel;
 import com.report.casio.remoting.transport.netty.client.cache.ChannelClient;
 import com.report.casio.remoting.transport.netty.client.cache.CompletableRequest;
 import com.report.casio.remoting.transport.netty.codec.RpcMessageDecoder;
@@ -72,10 +72,10 @@ public class NettyClient implements Client, RpcRequestTransport {
     }
 
     @Override
-    public Channel getChannel(InetSocketAddress inetSocketAddress) {
-        Channel channel = ChannelClient.get(inetSocketAddress);
-        if (channel == null) {
-            ChannelClient.put(inetSocketAddress, doConnect(inetSocketAddress));
+    public TimerChannel getChannel(InetSocketAddress inetSocketAddress) {
+        TimerChannel timerChannel = ChannelClient.get(inetSocketAddress);
+        if (timerChannel == null) {
+            ChannelClient.put(inetSocketAddress, new TimerChannel(doConnect(inetSocketAddress)));
         }
         return ChannelClient.get(inetSocketAddress);
     }
@@ -92,8 +92,10 @@ public class NettyClient implements Client, RpcRequestTransport {
             return completableFuture;
         }
 
-        Channel channel = getChannel(inetSocketAddress);
+        TimerChannel timerChannel = getChannel(inetSocketAddress);
+        Channel channel = timerChannel.getChannel();
         if (channel.isActive()) {
+            timerChannel.setLastRead();
             CompletableRequest.put(rpcRequest.getRequestId(), completableFuture);
             RpcMessage rpcMessage = new RpcMessage(rpcRequest);
             log.info("send message to {}", inetSocketAddress);

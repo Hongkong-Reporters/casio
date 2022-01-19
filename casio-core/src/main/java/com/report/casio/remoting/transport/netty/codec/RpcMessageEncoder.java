@@ -12,7 +12,7 @@ public class RpcMessageEncoder extends MessageToByteEncoder<RpcMessage> {
     protected void encode(ChannelHandlerContext channelHandlerContext, RpcMessage rpcMessage, ByteBuf byteBuf) {
         byteBuf.writeByte(ProtocolConstants.MAGIC);
         byteBuf.writeByte(ProtocolConstants.VERSION);
-        byteBuf.writeByte(rpcMessage.getType());
+        byteBuf.writeInt(rpcMessage.getType());
         byteBuf.writeInt(rpcMessage.getContent().length);
         byteBuf.writeBytes(rpcMessage.getContent());
     }

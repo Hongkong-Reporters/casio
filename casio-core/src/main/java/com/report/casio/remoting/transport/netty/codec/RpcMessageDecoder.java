@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
 
     public RpcMessageDecoder() {
-        this(ProtocolConstants.MAX_FRAME_LENGTH, 3, 4,
+        this(ProtocolConstants.MAX_FRAME_LENGTH, 6, 4,
                 -ProtocolConstants.MIN_LENGTH,0);
     }
 
@@ -43,7 +43,7 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
             if (in.readableBytes() < ProtocolConstants.MIN_LENGTH) return null;
         }
         byte version  = in.readByte();
-        byte type = in.readByte();
+        int type = in.readInt();
         int length = in.readInt();
         // 判断包是否完整，否则还原指针位置
         if (in.readableBytes() < length) {
