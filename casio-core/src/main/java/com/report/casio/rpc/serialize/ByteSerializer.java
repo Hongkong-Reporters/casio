@@ -1,12 +1,11 @@
-package com.report.casio.common.utils;
+package com.report.casio.rpc.serialize;
 
 import java.io.*;
 
-public class ByteUtils {
-    private ByteUtils() {
-    }
+public class ByteSerializer implements RpcSerializer {
 
-    public static byte[] objectToBytes(Object obj) throws IOException {
+    @Override
+    public byte[] serialize(Object obj) throws IOException {
         try (
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
                 ObjectOutputStream sOut = new ObjectOutputStream(out)
@@ -17,13 +16,17 @@ public class ByteUtils {
         }
     }
 
-    public static Object bytesToObject(byte[] bytes) throws IOException, ClassNotFoundException {
+    @Override
+    public <T> T deserialize(byte[] bytes, Class<T> clazz) throws IOException {
         try (
                 ByteArrayInputStream in = new ByteArrayInputStream(bytes);
                 ObjectInputStream sIn = new ObjectInputStream(in)
         ) {
-            return sIn.readObject();
+            return clazz.cast(sIn.readObject());
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
+        return null;
     }
 
 }

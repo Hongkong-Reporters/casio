@@ -68,7 +68,7 @@ public class RpcClientProxy implements RpcProxy, InvocationHandler {
                 }
             } while (rpcResponse == null);
             if (rpcResponse == null) {
-                throw new RpcException(method + "调用失败，多次调用仍然超时");
+                throw new RpcException(request.getRequestId(), method + "调用失败，多次调用仍然超时");
             }
             CompletableRequest.remove(rpcResponse.getRequestId());
             return rpcResponse.getResult();

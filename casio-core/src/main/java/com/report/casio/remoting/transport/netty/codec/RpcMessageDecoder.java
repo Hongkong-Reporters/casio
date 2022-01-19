@@ -1,10 +1,15 @@
 package com.report.casio.remoting.transport.netty.codec;
 
+import com.report.casio.common.extension.ExtensionLoader;
 import com.report.casio.domain.RpcMessage;
+import com.report.casio.domain.RpcRequest;
+import com.report.casio.domain.RpcResponse;
 import com.report.casio.rpc.protocol.ProtocolConstants;
+import com.report.casio.rpc.serialize.RpcSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -25,6 +30,7 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
         super(maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment, initialBytesToStrip);
     }
 
+    @SneakyThrows
     @Override
     protected Object decode(ChannelHandlerContext ctx, ByteBuf in) {
         if (in.readableBytes() < ProtocolConstants.MIN_LENGTH) {
@@ -55,7 +61,14 @@ public class RpcMessageDecoder extends LengthFieldBasedFrameDecoder {
         RpcMessage message = new RpcMessage();
         message.setVersion(version);
         message.setType(type);
-        message.setContent(data);
+        RpcSerializer serializer = ExtensionLoader.getExtensionLoader(RpcSerializer.class).getDefaultExtension();
+        if (type == ProtocolConstants.REQUEST_TYPE) {
+            message.setRequest(serializer.deserialize(data, RpcRequest.class));
+        } else if (type == ProtocolConstants.RESPONSE_TYPE) {
+            message.setResponse(serializer.deserialize(data, RpcResponse.class));
+        } else {
+            message.setMsg(serializer.deserialize(data, String.class));
+        }
         return message;
     }
 }
