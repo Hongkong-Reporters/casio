@@ -22,15 +22,21 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 @Slf4j
 public class NettyClient implements Client, RpcRequestTransport {
     private final Bootstrap bootstrap;
     private final EventLoopGroup workGroup;
+    private final Lock connectLock = new ReentrantLock();
 
-    public NettyClient() {
+    private static final NettyClient INSTANCE = new NettyClient();
+
+    private NettyClient() {
         this.bootstrap = new Bootstrap();
         this.workGroup = new NioEventLoopGroup();
         bootstrap.group(workGroup)
@@ -48,6 +54,10 @@ public class NettyClient implements Client, RpcRequestTransport {
                         pipeline.addLast(new NettyClientHandler());
                     }
                 });
+    }
+
+    public static NettyClient getInstance() {
+        return INSTANCE;
     }
 
     @SneakyThrows
@@ -78,6 +88,22 @@ public class NettyClient implements Client, RpcRequestTransport {
             ChannelClient.put(inetSocketAddress, new TimerChannel(doConnect(inetSocketAddress)));
         }
         return ChannelClient.get(inetSocketAddress);
+    }
+
+    @Override
+    public void reconnect(Channel channel) {
+        try {
+            connectLock.lock();
+            SocketAddress localAddress = channel.localAddress();
+            ChannelFuture future = channel.close();
+            if (future.isSuccess()) {
+                doConnect((InetSocketAddress) localAddress);
+            } else {
+                log.error(localAddress + " close error");
+            }
+        } finally {
+            connectLock.unlock();
+        }
     }
 
     @Override

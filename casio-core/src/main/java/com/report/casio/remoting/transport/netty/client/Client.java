@@ -13,4 +13,6 @@ public interface Client {
 
     TimerChannel getChannel(InetSocketAddress inetSocketAddress);
 
+    void reconnect(Channel channel);
+
 }

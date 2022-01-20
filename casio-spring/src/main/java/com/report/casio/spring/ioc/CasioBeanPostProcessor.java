@@ -22,7 +22,7 @@ import java.lang.reflect.Field;
  */
 @Component
 public class CasioBeanPostProcessor implements BeanPostProcessor {
-    private final NettyClient client = new NettyClient();
+    private final NettyClient client = NettyClient.getInstance();
 
     @Override
     @SneakyThrows
