@@ -1,2 +1,0 @@
-byte=com.report.casio.rpc.serialize.ByteSerializer
-kryo=com.report.casio.rpc.serialize.KryoSerializer

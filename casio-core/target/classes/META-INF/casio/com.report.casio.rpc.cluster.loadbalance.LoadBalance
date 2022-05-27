@@ -1,2 +1,0 @@
-round=com.report.casio.rpc.cluster.loadbalance.RoundLoadBalance
-random=com.report.casio.rpc.cluster.loadbalance.RandomLoadBalance
