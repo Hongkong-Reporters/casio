@@ -16,7 +16,7 @@ public class ConsumerStarter implements CasioStarter {
     public void start() {
         new CasioConfigInitHandler().init();
 
-        NettyClient client = new NettyClient();
+        NettyClient client = NettyClient.getInstance();
         IDemoService service = new RpcClientProxy(client).getProxy(IDemoService.class);
         WheelTimerJob.getInstance().execute();
 

@@ -1,6 +1,5 @@
 package com.report.casio.remoting.transport.netty.client;
 
-import com.report.casio.common.utils.ByteUtils;
 import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcResponse;
 import com.report.casio.remoting.transport.netty.client.cache.ChannelClient;
@@ -33,7 +32,7 @@ public class NettyClientHandler extends ChannelInboundHandlerAdapter {
             RpcMessage rpcMessage = (RpcMessage) msg;
             RpcResponse rpcResponse;
             if (rpcMessage.getType() == ProtocolConstants.RESPONSE_TYPE) {
-                rpcResponse = (RpcResponse) ByteUtils.bytesToObject(rpcMessage.getContent());
+                rpcResponse = rpcMessage.getResponse();
                 ChannelClient.get((InetSocketAddress) ctx.channel().remoteAddress()).setLastRead();
             } else if (rpcMessage.getType() == ProtocolConstants.HEARTBEAT) {
                 log.info("client receive heart beat, time: " + new Date());

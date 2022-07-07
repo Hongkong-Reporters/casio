@@ -1,28 +1,28 @@
 package com.report.casio.domain;
 
-import com.report.casio.common.utils.ByteUtils;
 import com.report.casio.rpc.protocol.ProtocolConstants;
 import lombok.Data;
 
-import java.io.IOException;
 import java.io.Serializable;
 
 @Data
 public class RpcMessage implements Serializable {
     private int type;
     private byte version;
-    private byte[] content;
+    private RpcRequest request;
+    private RpcResponse response;
+    private String msg;
 
     public RpcMessage() {}
 
-    public RpcMessage(RpcRequest request) throws IOException {
+    public RpcMessage(RpcRequest request) {
         this.type = ProtocolConstants.REQUEST_TYPE;
-        this.content = ByteUtils.objectToBytes(request);
+        this.request = request;
     }
 
-    public RpcMessage(RpcResponse response) throws IOException {
+    public RpcMessage(RpcResponse response) {
         this.type = ProtocolConstants.RESPONSE_TYPE;
-        this.content = ByteUtils.objectToBytes(response);
+        this.response = response;
     }
 
 }

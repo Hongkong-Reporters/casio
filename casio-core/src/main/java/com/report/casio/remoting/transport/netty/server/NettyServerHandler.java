@@ -1,19 +1,16 @@
 package com.report.casio.remoting.transport.netty.server;
 
 import com.report.casio.common.exception.RpcException;
-import com.report.casio.common.utils.ByteUtils;
 import com.report.casio.config.context.RpcContextFactory;
 import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
 import com.report.casio.rpc.protocol.ProtocolConstants;
-import com.report.casio.timer.WheelTimerJob;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Date;
 
@@ -34,7 +31,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             RpcMessage rpcMessage = (RpcMessage) msg;
             RpcRequest request;
             if (rpcMessage.getType() == ProtocolConstants.REQUEST_TYPE) {
-                request = (RpcRequest) ByteUtils.bytesToObject(rpcMessage.getContent());
+                request = rpcMessage.getRequest();
             } else if (rpcMessage.getType() == ProtocolConstants.HEARTBEAT) {
                 log.info("server receive heart beat, time: " + new Date());
                 return;
@@ -46,9 +43,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
             if (service == null) {
                 String errorMsg = "service Impl not exist, serviceName: " + request.getServiceName();
                 log.error(errorMsg);
-                RpcException exception = new RpcException(errorMsg);
-                exception.setRequestId(request.getRequestId());
-                throw exception;
+                throw new RpcException(request.getRequestId(), errorMsg);
             } else {
                 try {
                     Method method = service.getClass().getMethod(request.getMethodName(), request.getParameterTypes());
@@ -60,9 +55,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
                     ctx.writeAndFlush(resMessage);
                     log.info("server read success request {}, and execute success", request);
                 } catch (Exception e) {
-                    RpcException exception = new RpcException("server run error, msg: " + rpcMessage, e);
-                    exception.setRequestId(request.getRequestId());
-                    throw exception;
+                    throw new RpcException(request.getRequestId(), "server run error, msg: " + rpcMessage, e);
                 }
             }
             long executeTime = System.currentTimeMillis() - startTime;
@@ -82,7 +75,7 @@ public class NettyServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws IOException {
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         if (cause instanceof RpcException) {
             RpcException exception = (RpcException) cause;
             RpcResponse rpcResponse = new RpcResponse();

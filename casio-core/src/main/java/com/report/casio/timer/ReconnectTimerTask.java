@@ -1,6 +1,7 @@
 package com.report.casio.timer;
 
 import com.report.casio.remoting.transport.netty.TimerChannel;
+import com.report.casio.remoting.transport.netty.client.NettyClient;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -12,6 +13,7 @@ public class ReconnectTimerTask extends AbstractTimerTask {
         long duration = Math.min(System.currentTimeMillis() - channel.getLastRead(), System.currentTimeMillis() - channel.getLastWrite());
         if (duration > TIMEOUT) {
             log.warn(channel.getChannel().localAddress() + " client connect timeout");
+            NettyClient.getInstance().reconnect(channel.getChannel());
         }
     }
 }

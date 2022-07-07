@@ -4,8 +4,6 @@ import com.report.casio.domain.RpcMessage;
 import com.report.casio.remoting.transport.netty.TimerChannel;
 import com.report.casio.rpc.protocol.ProtocolConstants;
 
-import java.nio.charset.StandardCharsets;
-
 public class HeartbeatTimerTask extends AbstractTimerTask {
     private static final int DURATION = 15 * 1000;
 
@@ -15,7 +13,7 @@ public class HeartbeatTimerTask extends AbstractTimerTask {
             channel.setLastWrite();
             RpcMessage rpcMessage = new RpcMessage();
             rpcMessage.setType(ProtocolConstants.HEARTBEAT);
-            rpcMessage.setContent("heartbeat".getBytes(StandardCharsets.UTF_8));
+            rpcMessage.setMsg("heartbeat");
             channel.getChannel().writeAndFlush(rpcMessage);
         }
     }
