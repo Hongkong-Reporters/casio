@@ -1,6 +1,6 @@
 package com.report.casio.registry.zookeeper;
 
-import com.report.casio.registry.cache.ConsumerServiceDiscoveryCache;
+import com.report.casio.registry.zookeeper.cache.ZkServiceDiscoveryCache;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.RetryPolicy;
 import org.apache.curator.framework.CuratorFramework;
@@ -81,7 +81,7 @@ public class ZkUtils {
         if (exist(hostname, path)) {
             CuratorFramework framework = ZK_MAP.get(hostname);
             framework.getData()
-                    .usingWatcher((CuratorWatcher) watchedEvent -> ConsumerServiceDiscoveryCache.remove(path))
+                    .usingWatcher((CuratorWatcher) watchedEvent -> ZkServiceDiscoveryCache.remove(path))
                     .forPath(path);
         } else {
             log.error("{} not exist node, can not add watcher", hostname);
