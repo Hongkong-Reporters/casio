@@ -25,6 +25,10 @@ public class ProviderConfig {
         return this.address + ":" + port;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
     public int getPort() {
         return port;
     }

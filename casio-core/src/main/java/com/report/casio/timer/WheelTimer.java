@@ -16,6 +16,8 @@ public class WheelTimer {
     private final WheelBucket[] wheelBuckets;
     private final AtomicInteger index = new AtomicInteger(0);
 
+    private ScheduledFuture<?> scheduledFuture;
+
     public WheelTimer(int size, int tickDuration, TimeUnit timeUnit) {
         this.size = size;
         this.tickDuration = tickDuration;
@@ -54,7 +56,13 @@ public class WheelTimer {
             WheelBucket wheelBucket = wheelBuckets[i % size];
             wheelBucket.execute(i % size * tickDuration);
         };
-        service.scheduleAtFixedRate(runnable, 0, tickDuration, timeUnit);
+        this.scheduledFuture = service.scheduleAtFixedRate(runnable, 0, tickDuration, timeUnit);
+    }
+
+    public void close() {
+        if (this.scheduledFuture != null && !this.scheduledFuture.isDone()) {
+            this.scheduledFuture.cancel(true);
+        }
     }
 
     /**

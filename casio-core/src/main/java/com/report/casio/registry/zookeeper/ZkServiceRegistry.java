@@ -15,7 +15,8 @@ public class ZkServiceRegistry implements ServiceRegistry {
 
         for (RegistryConfig registryConfig : registryConfigs) {
             ZkUtils.create(registryConfig.getHost(),
-                    StringUtils.generateProviderPath(serviceConfig.getServiceName(), RpcContextFactory.getConfigContext().getProviderConfig().getHost()), null);
+                    StringUtils.generateProviderPath(serviceConfig.getServiceName(), RpcContextFactory.getConfigContext().getProviderConfig().getHost()),
+                    null);
         }
     }
 }

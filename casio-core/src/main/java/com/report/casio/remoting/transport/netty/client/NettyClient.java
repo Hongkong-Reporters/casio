@@ -34,9 +34,7 @@ public class NettyClient implements Client, RpcRequestTransport {
     private final EventLoopGroup workGroup;
     private final Lock connectLock = new ReentrantLock();
 
-    private static final NettyClient INSTANCE = new NettyClient();
-
-    private NettyClient() {
+    public NettyClient() {
         this.bootstrap = new Bootstrap();
         this.workGroup = new NioEventLoopGroup();
         bootstrap.group(workGroup)
@@ -54,10 +52,6 @@ public class NettyClient implements Client, RpcRequestTransport {
                         pipeline.addLast(new NettyClientHandler());
                     }
                 });
-    }
-
-    public static NettyClient getInstance() {
-        return INSTANCE;
     }
 
     @SneakyThrows

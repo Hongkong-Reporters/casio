@@ -38,10 +38,14 @@ public class ServiceConfig {
         public Builder serviceName(Class<?> serviceClass) {
             Register register = serviceClass.getAnnotation(Register.class);
             String name;
-            if (register.interfaceClass().equals(void.class)) {
-                name = serviceClass.getInterfaces()[0].getName();
+            if (register != null) {
+                if (register.interfaceClass().equals(void.class)) {
+                    name = serviceClass.getInterfaces()[0].getName();
+                } else {
+                    name = register.interfaceClass().getName();
+                }
             } else {
-                name = register.interfaceClass().getName();
+                name = serviceClass.getName();
             }
             return serviceName(name);
         }
