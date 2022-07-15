@@ -16,7 +16,7 @@ public class Bootstraps implements Bootstrap {
     private ProviderBootstrap providerBootstrap;
     private ConsumerBootstrap consumerBootstrap;
     private WheelTimerJob wheelTimerJob;
-    private final ScheduledExecutorService service = Executors.newScheduledThreadPool(2);;
+    private final ScheduledExecutorService service = Executors.newScheduledThreadPool(2);
 
     @SneakyThrows
     public void start() {
