@@ -2,6 +2,7 @@ package com.report.casio.remoting.transport.netty.client;
 
 import com.report.casio.common.exception.RemotingException;
 import com.report.casio.common.extension.ExtensionLoader;
+import com.report.casio.common.utils.SystemUtil;
 import com.report.casio.domain.RpcMessage;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.domain.RpcResponse;
@@ -14,6 +15,8 @@ import com.report.casio.remoting.transport.netty.codec.RpcMessageDecoder;
 import com.report.casio.remoting.transport.netty.codec.RpcMessageEncoder;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
@@ -36,9 +39,9 @@ public class NettyClient implements Client, RpcRequestTransport {
 
     public NettyClient() {
         this.bootstrap = new Bootstrap();
-        this.workGroup = new NioEventLoopGroup();
+        this.workGroup = SystemUtil.isLinux() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
         bootstrap.group(workGroup)
-                .channel(NioSocketChannel.class)
+                .channel(SystemUtil.isLinux() ? EpollSocketChannel.class : NioSocketChannel.class)
                 // 设置客户端调用服务端接口的超时时间5s
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
                 .handler(new ChannelInitializer<SocketChannel>() {

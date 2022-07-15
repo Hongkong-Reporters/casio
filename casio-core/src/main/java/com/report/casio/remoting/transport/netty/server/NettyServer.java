@@ -1,9 +1,12 @@
 package com.report.casio.remoting.transport.netty.server;
 
+import com.report.casio.common.utils.SystemUtil;
 import com.report.casio.remoting.transport.netty.codec.RpcMessageDecoder;
 import com.report.casio.remoting.transport.netty.codec.RpcMessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -28,11 +31,11 @@ public class NettyServer implements Server {
         this.host = host;
         this.port = port;
         this.bootstrap = new ServerBootstrap();
-        this.bossGroup = new NioEventLoopGroup();
-        this.workGroup = new NioEventLoopGroup();
+        this.bossGroup = SystemUtil.isLinux() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+        this.workGroup = SystemUtil.isLinux() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
         bootstrap.group(bossGroup, workGroup)
-                .channel(NioServerSocketChannel.class)
+                .channel(SystemUtil.isLinux() ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
