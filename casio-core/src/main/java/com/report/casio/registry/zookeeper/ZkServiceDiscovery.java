@@ -1,7 +1,7 @@
 package com.report.casio.registry.zookeeper;
 
 import com.report.casio.common.extension.ExtensionLoader;
-import com.report.casio.common.utils.StringUtils;
+import com.report.casio.common.utils.StringUtil;
 import com.report.casio.config.RegistryConfig;
 import com.report.casio.config.context.RpcContextFactory;
 import com.report.casio.domain.RpcRequest;
@@ -19,7 +19,7 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
     @Override
     public InetSocketAddress lookup(RpcRequest rpcRequest) {
         try {
-            String path = StringUtils.generateProviderPath(rpcRequest.getServiceName());
+            String path = StringUtil.generateProviderPath(rpcRequest.getServiceName());
             List<String> hosts;
             // 调用缓存访问
             if (ZkServiceDiscoveryCache.contains(path)) {
@@ -36,7 +36,7 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
             }
             LoadBalance loadBalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getDefaultExtension();
             String hostname = loadBalance.select(hosts, rpcRequest.getServiceName());
-            if (StringUtils.isBlank(hostname)) {
+            if (StringUtil.isBlank(hostname)) {
                 return null;
             }
             String[] split = hostname.split(":");

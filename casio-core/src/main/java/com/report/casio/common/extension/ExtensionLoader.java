@@ -2,7 +2,7 @@ package com.report.casio.common.extension;
 
 import com.report.casio.common.annotation.SPI;
 import com.report.casio.common.exception.ExtensionException;
-import com.report.casio.common.utils.StringUtils;
+import com.report.casio.common.utils.StringUtil;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -61,7 +61,7 @@ public class ExtensionLoader<T> {
 
     @SuppressWarnings("unchecked")
     public T getExtension(String name) throws ExtensionException {
-        if (StringUtils.isBlank(name)) {
+        if (StringUtil.isBlank(name)) {
             throw new ExtensionException("extension name is null");
         }
         if ("true".equals(name)) {
@@ -123,7 +123,7 @@ public class ExtensionLoader<T> {
         SPI spi = type.getAnnotation(SPI.class);
         if (spi != null) {
             String value = spi.value();
-            if (StringUtils.isNotBlank(value)) {
+            if (StringUtil.isNotBlank(value)) {
                 String[] names = value.split(NAME_SEPARATOR);
                 if (names.length == 1) {
                     defaultName = names[0];

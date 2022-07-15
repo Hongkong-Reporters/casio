@@ -1,7 +1,7 @@
 package com.report.casio.config.parser;
 
 import com.report.casio.common.annotation.Register;
-import com.report.casio.common.utils.StringUtils;
+import com.report.casio.common.utils.StringUtil;
 import com.report.casio.config.ServiceConfig;
 import lombok.extern.slf4j.Slf4j;
 
@@ -61,7 +61,7 @@ public class AnnotationBeanParser {
 
     public static Set<Class<?>> scan(String packageName) throws ClassNotFoundException {
         Set<Class<?>> res = new HashSet<>();
-        if (StringUtils.isBlank(packageName)) {
+        if (StringUtil.isBlank(packageName)) {
             return res;
         }
 
@@ -106,6 +106,6 @@ public class AnnotationBeanParser {
     }
 
     private static boolean isClassPath(String path) {
-        return !StringUtils.isBlank(path) && path.contains(CLASS_SUFFIX);
+        return !StringUtil.isBlank(path) && path.contains(CLASS_SUFFIX);
     }
 }
