@@ -25,7 +25,7 @@ public class RpcClientProxy implements RpcProxy, InvocationHandler {
     private final Map<String, Integer> countMap = new ConcurrentHashMap<>();
     private final int retries = RpcContextFactory.getConfigContext().getConsumerConfig().getRetries();
 
-    public RpcClientProxy(RpcRequestTransport transport) {
+    protected RpcClientProxy(RpcRequestTransport transport) {
         this.transport = transport;
     }
 

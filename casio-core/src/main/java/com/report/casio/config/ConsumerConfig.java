@@ -8,6 +8,9 @@ public class ConsumerConfig {
     private int timeout = Constants.DEFAULT_TIMEOUT;
     // 调用超时，重试次数
     private int retries = Constants.DEFAULT_RETIES;
+
+    private int cacheSize = Constants.DEFAULT_CACHE_SIZE;
+
     // 启动时是否检查服务
     private boolean check = false;
 
@@ -25,6 +28,14 @@ public class ConsumerConfig {
 
     public int getRetries() {
         return retries;
+    }
+
+    public void setCacheSize(int cacheSize) {
+        this.cacheSize = cacheSize;
+    }
+
+    public int getCacheSize() {
+        return cacheSize;
     }
 
     protected void setCheck(boolean check) {

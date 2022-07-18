@@ -1,10 +1,12 @@
 package com.report.casio.remoting.transport.netty.server;
 
-import com.report.casio.config.context.RpcContextFactory;
+import com.report.casio.common.utils.SystemUtil;
 import com.report.casio.remoting.transport.netty.codec.RpcMessageDecoder;
 import com.report.casio.remoting.transport.netty.codec.RpcMessageEncoder;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.*;
+import io.netty.channel.epoll.EpollEventLoopGroup;
+import io.netty.channel.epoll.EpollServerSocketChannel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
@@ -13,30 +15,27 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.IdleStateHandler;
 import lombok.extern.slf4j.Slf4j;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
 public class NettyServer implements Server {
-    private static final int PORT = RpcContextFactory.getConfigContext().getProviderConfig().getPort();
     private final ServerBootstrap bootstrap;
     private final EventLoopGroup bossGroup;
     private final EventLoopGroup workGroup;
-    private static final NettyServer INSTANCE = new NettyServer();
     private Channel channel;
 
-    public static NettyServer getInstance() {
-        return INSTANCE;
-    }
+    private final String host;
+    private final int port;
 
-    private NettyServer() {
+    public NettyServer(String host, int port) {
+        this.host = host;
+        this.port = port;
         this.bootstrap = new ServerBootstrap();
-        this.bossGroup = new NioEventLoopGroup();
-        this.workGroup = new NioEventLoopGroup();
+        this.bossGroup = SystemUtil.isLinux() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
+        this.workGroup = SystemUtil.isLinux() ? new EpollEventLoopGroup() : new NioEventLoopGroup();
 
         bootstrap.group(bossGroup, workGroup)
-                .channel(NioServerSocketChannel.class)
+                .channel(SystemUtil.isLinux() ? EpollServerSocketChannel.class : NioServerSocketChannel.class)
                 .childOption(ChannelOption.TCP_NODELAY, true)
                 .handler(new LoggingHandler(LogLevel.INFO))
                 .childHandler(new ChannelInitializer<SocketChannel>() {
@@ -55,12 +54,11 @@ public class NettyServer implements Server {
     @Override
     public void doOpen() {
         try {
-            String host = InetAddress.getLocalHost().getHostAddress();
-            ChannelFuture future = bootstrap.bind(host, PORT).sync();
+            ChannelFuture future = bootstrap.bind(host, port).sync();
             // sync表示同步，线程会阻塞在此处
             this.channel = future.channel();
             this.channel.closeFuture().sync();
-        } catch (UnknownHostException | InterruptedException exception) {
+        } catch (InterruptedException exception) {
             log.error("netty server open failed");
         } finally {
             doClose();

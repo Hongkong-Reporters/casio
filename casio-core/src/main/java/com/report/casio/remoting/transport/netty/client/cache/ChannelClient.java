@@ -1,7 +1,6 @@
 package com.report.casio.remoting.transport.netty.client.cache;
 
 import com.report.casio.remoting.transport.netty.TimerChannel;
-import io.netty.channel.Channel;
 
 import java.net.InetSocketAddress;
 import java.util.Collection;

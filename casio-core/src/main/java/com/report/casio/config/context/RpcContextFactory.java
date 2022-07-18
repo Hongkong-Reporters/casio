@@ -14,7 +14,7 @@ public class RpcContextFactory {
     private RpcContextFactory() {
     }
 
-    public static void createConfigContext(ProviderConfig providerConfig, ConsumerConfig consumerConfig,
+    public static RpcConfigContext createConfigContext(ProviderConfig providerConfig, ConsumerConfig consumerConfig,
                                            List<RegistryConfig> registryConfigs, List<ServiceConfig> serviceConfigs) {
         if (configContext == null) {
             // 饿汉模式双空指针判断
@@ -28,6 +28,7 @@ public class RpcContextFactory {
                     serviceConfigs.forEach(serviceConfig -> configContext.addServiceConfig(serviceConfig));
             }
         }
+        return configContext;
     }
 
     public static RpcConfigContext getConfigContext() {

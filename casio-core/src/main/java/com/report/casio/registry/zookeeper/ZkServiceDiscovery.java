@@ -1,12 +1,12 @@
 package com.report.casio.registry.zookeeper;
 
 import com.report.casio.common.extension.ExtensionLoader;
-import com.report.casio.common.utils.StringUtils;
+import com.report.casio.common.utils.StringUtil;
 import com.report.casio.config.RegistryConfig;
 import com.report.casio.config.context.RpcContextFactory;
 import com.report.casio.domain.RpcRequest;
 import com.report.casio.registry.ServiceDiscovery;
-import com.report.casio.registry.cache.ConsumerServiceDiscoveryCache;
+import com.report.casio.registry.cache.ServiceCacheFactory;
 import com.report.casio.rpc.cluster.loadbalance.LoadBalance;
 
 import java.net.InetSocketAddress;
@@ -19,11 +19,12 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
     @Override
     public InetSocketAddress lookup(RpcRequest rpcRequest) {
         try {
-            String path = StringUtils.generateProviderPath(rpcRequest.getServiceName());
+            String path = StringUtil.generateProviderPath(rpcRequest.getServiceName());
+            ServiceCacheFactory cacheFactory = ExtensionLoader.getExtensionLoader(ServiceCacheFactory.class).getDefaultExtension();
             List<String> hosts;
             // 调用缓存访问
-            if (ConsumerServiceDiscoveryCache.contains(path)) {
-                hosts = ConsumerServiceDiscoveryCache.get(path);
+            if (cacheFactory.getCache().get(path) != null) {
+                hosts = cacheFactory.getCache().get(path);
             } else {
                 Set<String> childNode = new HashSet<>();
                 for (RegistryConfig registryConfig : RpcContextFactory.getConfigContext().getRegistryConfigs()) {
@@ -32,11 +33,11 @@ public class ZkServiceDiscovery implements ServiceDiscovery {
                     ZkUtils.addNodeWatcher(registryConfig.getHost(), path);
                 }
                 hosts = new ArrayList<>(childNode);
-                ConsumerServiceDiscoveryCache.put(path, hosts);
+                cacheFactory.getCache().put(path, hosts);
             }
             LoadBalance loadBalance = ExtensionLoader.getExtensionLoader(LoadBalance.class).getDefaultExtension();
             String hostname = loadBalance.select(hosts, rpcRequest.getServiceName());
-            if (StringUtils.isBlank(hostname)) {
+            if (StringUtil.isBlank(hostname)) {
                 return null;
             }
             String[] split = hostname.split(":");

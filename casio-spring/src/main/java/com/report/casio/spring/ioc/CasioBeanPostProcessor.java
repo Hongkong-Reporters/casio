@@ -5,8 +5,7 @@ import com.report.casio.common.annotation.Register;
 import com.report.casio.common.extension.ExtensionLoader;
 import com.report.casio.config.ServiceConfig;
 import com.report.casio.registry.ServiceRegistry;
-import com.report.casio.remoting.transport.netty.client.NettyClient;
-import com.report.casio.rpc.proxy.RpcClientProxy;
+import com.report.casio.rpc.proxy.RpcProxyUtil;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
@@ -22,7 +21,6 @@ import java.lang.reflect.Field;
  */
 @Component
 public class CasioBeanPostProcessor implements BeanPostProcessor {
-    private final NettyClient client = NettyClient.getInstance();
 
     @Override
     @SneakyThrows
@@ -47,12 +45,11 @@ public class CasioBeanPostProcessor implements BeanPostProcessor {
         Field[] fields = clazz.getDeclaredFields();
         for (Field field : fields) {
             if (field.isAnnotationPresent(Reference.class)) {
-                Object proxy = new RpcClientProxy(client).getProxy(clazz);
+                Object proxy = RpcProxyUtil.getProxy(clazz);
                 field.setAccessible(true);
                 field.set(bean, proxy);
             }
         }
-
         return bean;
     }
 

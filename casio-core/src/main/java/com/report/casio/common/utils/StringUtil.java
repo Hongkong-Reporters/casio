@@ -2,10 +2,10 @@ package com.report.casio.common.utils;
 
 import com.report.casio.common.Constants;
 
-public class StringUtils {
+public class StringUtil {
     private static final String ZK_SEPARATOR = "/";
 
-    private StringUtils() {}
+    private StringUtil() {}
 
     public static boolean isBlank(String s) {
         return s == null || s.isEmpty() || s.trim().isEmpty();

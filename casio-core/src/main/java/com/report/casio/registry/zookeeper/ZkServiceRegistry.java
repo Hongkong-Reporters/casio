@@ -1,6 +1,6 @@
 package com.report.casio.registry.zookeeper;
 
-import com.report.casio.common.utils.StringUtils;
+import com.report.casio.common.utils.StringUtil;
 import com.report.casio.config.RegistryConfig;
 import com.report.casio.config.context.RpcContextFactory;
 import com.report.casio.config.ServiceConfig;
@@ -15,7 +15,8 @@ public class ZkServiceRegistry implements ServiceRegistry {
 
         for (RegistryConfig registryConfig : registryConfigs) {
             ZkUtils.create(registryConfig.getHost(),
-                    StringUtils.generateProviderPath(serviceConfig.getServiceName(), RpcContextFactory.getConfigContext().getProviderConfig().getHost()), null);
+                    StringUtil.generateProviderPath(serviceConfig.getServiceName(), RpcContextFactory.getConfigContext().getProviderConfig().getHost()),
+                    null);
         }
     }
 }
