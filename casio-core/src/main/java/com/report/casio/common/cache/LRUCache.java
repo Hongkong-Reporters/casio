@@ -8,6 +8,12 @@ import java.util.concurrent.locks.ReentrantLock;
 /**
  * @author hujiaofen
  * @since 18/7/2022
+ * LRU：least recently used（最近最少使用）
+ * 实现方案：通过链表实现，最新的访问的数据放在最右边（已经存在的数据也要挪到最右边）
+ *         当数据达到最大缓存，删除最左边的数据
+ * LinkedHashMap的removeEldestEntry已经实现了LRU
+ * 缺点：一次性或者周期性的数据过多会占用cache空间，导致cache都是无用的数据
+ * todo：可以通过LRU-K提高缓存命中率
  */
 public class LRUCache<K, V> extends LinkedHashMap<K, V> {
     private final Lock lock = new ReentrantLock();
