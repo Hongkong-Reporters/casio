@@ -20,6 +20,9 @@ public class LRUCache<K, V> extends LinkedHashMap<K, V> {
     private final int cacheSize;
 
     public LRUCache(int cacheSize) {
+        if (cacheSize <= 0) {
+            throw new IllegalArgumentException("illegal invalid cache size: " + cacheSize);
+        }
         this.cacheSize = cacheSize;
     }
 
