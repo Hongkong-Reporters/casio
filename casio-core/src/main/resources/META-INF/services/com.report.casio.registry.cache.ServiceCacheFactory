@@ -1,0 +1,2 @@
+lfu=com.report.casio.registry.cache.lfu.ServiceLfuCacheFactory
+lru=com.report.casio.registry.cache.lru.ServiceLruCacheFactory

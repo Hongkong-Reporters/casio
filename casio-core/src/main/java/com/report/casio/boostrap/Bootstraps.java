@@ -3,8 +3,9 @@ package com.report.casio.boostrap;
 import com.report.casio.common.Constants;
 import com.report.casio.common.extension.ExtensionLoader;
 import com.report.casio.config.ServiceConfig;
-import com.report.casio.config.context.RpcContextFactory;
+import com.report.casio.config.context.RpcConfigContext;
 import com.report.casio.config.parser.ConfigParser;
+import com.report.casio.registry.cache.ServiceCacheFactory;
 import com.report.casio.rpc.proxy.RpcProxyUtil;
 import com.report.casio.timer.WheelTimerJob;
 import lombok.SneakyThrows;
@@ -22,17 +23,20 @@ public class Bootstraps implements Bootstrap {
     public void start() {
 
         // todo：type判断哪种读取方式
-        ConfigParser extension = ExtensionLoader.getExtensionLoader(ConfigParser.class).getDefaultExtension();
-        extension.parse(Constants.DEFAULT_CONFIG_PATH);
+        ConfigParser configParser = ExtensionLoader.getExtensionLoader(ConfigParser.class).getDefaultExtension();
+        RpcConfigContext configContext = configParser.parse(Constants.DEFAULT_CONFIG_PATH);
 
-        providerBootstrap = new ProviderBootstrap(RpcContextFactory.getConfigContext().getProviderConfig());
+        providerBootstrap = new ProviderBootstrap(configContext.getProviderConfig());
         service.execute(() -> providerBootstrap.start());
 
-        consumerBootstrap = new ConsumerBootstrap(RpcContextFactory.getConfigContext().getConsumerConfig());
+        consumerBootstrap = new ConsumerBootstrap(configContext.getConsumerConfig());
         service.execute(() -> consumerBootstrap.start());
 
         this.wheelTimerJob = new WheelTimerJob(consumerBootstrap.getNettyClient());
         this.wheelTimerJob.execute();
+
+        ServiceCacheFactory cacheFactory = ExtensionLoader.getExtensionLoader(ServiceCacheFactory.class).getDefaultExtension();
+        cacheFactory.createCache(configContext.getConsumerConfig().getCacheSize());
 
         RpcProxyUtil.createProxy(consumerBootstrap.getNettyClient());
     }

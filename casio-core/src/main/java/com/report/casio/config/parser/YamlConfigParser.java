@@ -6,6 +6,7 @@ import com.report.casio.config.ConsumerConfig;
 import com.report.casio.config.ProviderConfig;
 import com.report.casio.config.RegistryConfig;
 import com.report.casio.config.ServiceConfig;
+import com.report.casio.config.context.RpcConfigContext;
 import com.report.casio.config.context.RpcContextFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
@@ -19,7 +20,7 @@ import java.util.Map;
 public class YamlConfigParser implements ConfigParser {
 
     @Override
-    public void parse(String path) throws ContextException {
+    public RpcConfigContext parse(String path) throws ContextException {
         Yaml yaml = new Yaml();
         InputStream inputStream = YamlConfigParser.class
                 .getClassLoader()
@@ -62,7 +63,7 @@ public class YamlConfigParser implements ConfigParser {
             List<RegistryConfig> registryConfigs = new ArrayList<>();
             registryConfigs.add(registryConfig);
             List<ServiceConfig> serviceConfigs = new ArrayList<>();
-            RpcContextFactory.createConfigContext(providerConfig, consumerConfig, registryConfigs, serviceConfigs);
+            return RpcContextFactory.createConfigContext(providerConfig, consumerConfig, registryConfigs, serviceConfigs);
         } catch (Exception e) {
             throw new ContextException(path + " parser error", e.getCause());
         }

@@ -23,7 +23,9 @@ public class ApplicationTest {
         }
         IDemoService service = RpcProxyUtil.getProxy(IDemoService.class);
         assert service != null;
-        System.out.println(service.sayHello());
+        for (int i = 0; i < 10; i++) {
+            System.out.println(service.sayHello());
+        }
     }
 
 }
