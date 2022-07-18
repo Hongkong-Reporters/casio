@@ -1,6 +1,7 @@
 package com.report.casio.test;
 
 import com.report.casio.boostrap.Bootstraps;
+import com.report.casio.embed.EmbeddedZookeeper;
 import com.report.casio.rpc.proxy.RpcProxyUtil;
 import com.report.casio.test.service.IDemoService;
 
@@ -11,13 +12,21 @@ import com.report.casio.test.service.IDemoService;
 public class ApplicationTest {
 
     public static void main(String[] args) {
+        new EmbeddedZookeeper(2181, false, "C:\\Ceilzcx\\project\\data\\zookeeper").start();
+        try {
+            // zk启动等待时间
+            Thread.sleep(1000);
+        } catch (InterruptedException exception) {
+            exception.printStackTrace();
+        }
+
         Bootstraps bootstraps = new Bootstraps();
         bootstraps.start();
         bootstraps.registerService(IDemoService.class);
 
         try {
-            // 启动等待时间
-            Thread.sleep(3000);
+            // casio启动等待时间
+            Thread.sleep(1000);
         } catch (InterruptedException exception) {
             exception.printStackTrace();
         }
